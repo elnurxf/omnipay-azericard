@@ -1,23 +1,29 @@
+
 <?php
 
 namespace Omnipay\AzeriCard\Message;
+
+use Omnipay\AzeriCard\Constants;
 
 class RefundRequest extends AbstractRequest
 {
     public function getData()
     {
+        $this->validate('amount', 'transactionId', 'terminalId');
+        $this->validateRefundSpecificFields();
+        
         $timestamp = $this->generateTimestamp();
         $nonce = $this->generateNonce();
-        $amount = number_format($this->getAmount(), 2, '.', '');
+        $amount = $this->formatAmount($this->getAmount());
 
         $data = [
             'AMOUNT'    => $amount,
-            'CURRENCY'  => 'AZN',
+            'CURRENCY'  => Constants::CURRENCY_AZN,
             'ORDER'     => $this->getTransactionId(),
-            'RRN'       => $this->getParameter('rrn'),
-            'INT_REF'   => $this->getParameter('intRef'),
-            'TERMINAL'  => $this->getParameter('terminalId'),
-            'TRTYPE'    => '22',
+            'RRN'       => $this->getRRN(),
+            'INT_REF'   => $this->getIntRef(),
+            'TERMINAL'  => $this->getTerminalId(),
+            'TRTYPE'    => Constants::TRTYPE_REFUND,
             'TIMESTAMP' => $timestamp,
             'NONCE'     => $nonce,
             'MAC_KEY_INDEX' => 0,
@@ -38,6 +44,37 @@ class RefundRequest extends AbstractRequest
 
     public function sendData($data)
     {
-        return $this->response = new PurchaseResponse($this, $data);
+        return $this->response = new RefundResponse($this, $data);
+    }
+    
+    protected function validateRefundSpecificFields()
+    {
+        if (empty($this->getRRN())) {
+            throw new \InvalidArgumentException('RRN is required for refunds');
+        }
+        
+        if (empty($this->getIntRef())) {
+            throw new \InvalidArgumentException('INT_REF is required for refunds');
+        }
+    }
+    
+    public function getRRN()
+    {
+        return $this->getParameter('rrn');
+    }
+    
+    public function setRRN($value)
+    {
+        return $this->setParameter('rrn', $value);
+    }
+    
+    public function getIntRef()
+    {
+        return $this->getParameter('intRef');
+    }
+    
+    public function setIntRef($value)
+    {
+        return $this->setParameter('intRef', $value);
     }
 }
