@@ -101,9 +101,9 @@ The gateway signs and verifies all transactions using **RSA-SHA256**. Make sure 
 - [x] Purchase (TRTYPE 1)
 - [x] Refund (TRTYPE 22)
 - [x] Verify P_SIGN signatures
-- [ ] Sales completion (TRTYPE 21)
-- [ ] Status check (TRTYPE 90)
-- [ ] Tokenization support
+- [x] Sales completion (TRTYPE 21)
+- [x] Status check (TRTYPE 90)
+- [x] Tokenization support
 
 ---
 
