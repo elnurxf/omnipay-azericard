@@ -236,7 +236,7 @@ abstract class AbstractRequest extends BaseRequest
             'trtype'      => ['max' => 1, 'name' => 'TRTYPE'],
             'country'     => ['max' => 2, 'min' => 2, 'name' => 'COUNTRY'],
             'merchGmt'    => ['max' => 5, 'min' => 1, 'name' => 'MERCH_GMT'],
-            'backref'     => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
+            'returnUrl'   => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
             'timestamp'   => ['max' => 14, 'min' => 14, 'name' => 'TIMESTAMP'],
             'nonce'       => ['max' => 64, 'min' => 1, 'name' => 'NONCE'],
             'lang'        => ['max' => 2, 'min' => 2, 'name' => 'LANG'],

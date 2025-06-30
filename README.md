@@ -4,7 +4,7 @@
 
 This package provides AzeriCard e-commerce gateway integration with support for 3D Secure, refunds, and signature verification.
 
-> Built and maintained by [Elnur Akhundov](mailto:elnurxf@gmail.com)
+> Built and maintained by [Elnur Akhudov](mailto:elnurxf@gmail.com)
 
 ---
 
@@ -249,4 +249,4 @@ The gateway signs and verifies all transactions using **RSA-SHA256**. Make sure 
 
 ## License
 
-MIT © [Elnur Akhundov](mailto:elnurxf@gmail.com)
+MIT © [Elnur Akhudov](mailto:elnurxf@gmail.com)

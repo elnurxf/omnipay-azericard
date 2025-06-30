@@ -2,8 +2,6 @@
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\AzeriCard\Constants;
-
 class StatusRequest extends AbstractRequest
 {
     /**

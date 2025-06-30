@@ -29,7 +29,7 @@ class AuthorizeRequest extends AbstractRequest
             'DESC'          => $this->getDescription() ?: 'Authorization',
             'TERMINAL'      => $this->getTerminalId(),
             'TRTYPE'        => Constants::TRTYPE_PRE_AUTH,
-            'BACKREF'       => $this->getBackref() ?: $this->getReturnUrl(),
+            'BACKREF'       => $this->getReturnUrl(),
             'TIMESTAMP'     => $timestamp,
             'NONCE'         => $nonce,
             'MAC_KEY_INDEX' => 0,
@@ -101,7 +101,7 @@ class AuthorizeRequest extends AbstractRequest
      */
     protected function validateAuthorizationSpecificFields()
     {
-        if (empty($this->getBackref()) && empty($this->getReturnUrl())) {
+        if (empty($this->getReturnUrl())) {
             throw new \InvalidArgumentException('Return URL (BACKREF) is required for authorization');
         }
 

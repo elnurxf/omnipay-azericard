@@ -29,7 +29,7 @@ class PurchaseRequest extends AbstractRequest
             'DESC'          => $this->getDescription() ?: 'Payment',
             'TERMINAL'      => $this->getTerminalId(),
             'TRTYPE'        => $this->getTrtype() ?: Constants::TRTYPE_PURCHASE,
-            'BACKREF'       => $this->getBackref() ?: $this->getReturnUrl(),
+            'BACKREF'       => $this->getReturnUrl(),
             'TIMESTAMP'     => $timestamp,
             'NONCE'         => $nonce,
             'MAC_KEY_INDEX' => 0,
@@ -90,7 +90,7 @@ class PurchaseRequest extends AbstractRequest
      */
     protected function validatePurchaseSpecificFields()
     {
-        if (empty($this->getBackref()) && empty($this->getReturnUrl())) {
+        if (empty($this->getReturnUrl())) {
             throw new \InvalidArgumentException('Return URL (BACKREF) is required for purchases');
         }
 
