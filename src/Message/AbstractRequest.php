@@ -130,7 +130,7 @@ abstract class AbstractRequest extends BaseRequest
     {
         return $this->getTestMode()
         ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
-        : 'https://secure.azericard.com/cgi-bin/cgi_link';
+        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
     }
 
     /**
@@ -266,6 +266,27 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
+     * Get the order/transaction identifier.
+     *
+     * @return string|null The order identifier
+     */
+    public function getOrder()
+    {
+        return $this->getParameter('order') ?: $this->getTransactionId();
+    }
+
+    /**
+     * Set the order identifier.
+     *
+     * @param string $value The order identifier
+     * @return $this
+     */
+    public function setOrder($value)
+    {
+        return $this->setParameter('order', $value);
+    }
+
+    /**
      * Validate that ORDER field is numeric and meets requirements.
      *
      * @return void
@@ -297,5 +318,47 @@ abstract class AbstractRequest extends BaseRequest
         }
 
         return bin2hex(random_bytes($length / 2));
+    }
+
+    /**
+     * Get the timestamp.
+     *
+     * @return string|null The timestamp
+     */
+    public function getTimestamp()
+    {
+        return $this->getParameter('timestamp');
+    }
+
+    /**
+     * Set the timestamp.
+     *
+     * @param string $value The timestamp
+     * @return $this
+     */
+    public function setTimestamp($value)
+    {
+        return $this->setParameter('timestamp', $value);
+    }
+
+    /**
+     * Get the nonce.
+     *
+     * @return string|null The nonce
+     */
+    public function getNonce()
+    {
+        return $this->getParameter('nonce');
+    }
+
+    /**
+     * Set the nonce.
+     *
+     * @param string $value The nonce
+     * @return $this
+     */
+    public function setNonce($value)
+    {
+        return $this->setParameter('nonce', $value);
     }
 }

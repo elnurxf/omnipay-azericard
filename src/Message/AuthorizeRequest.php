@@ -29,13 +29,16 @@ class AuthorizeRequest extends AbstractRequest
             'DESC'          => $this->getDescription() ?: 'Authorization',
             'TERMINAL'      => $this->getTerminalId(),
             'TRTYPE'        => Constants::TRTYPE_PRE_AUTH,
-            'BACKREF'       => $this->getReturnUrl(),
             'TIMESTAMP'     => $timestamp,
             'NONCE'         => $nonce,
             'MAC_KEY_INDEX' => 0,
         ];
 
         // Add optional fields if provided
+        if ($this->getReturnUrl()) {
+            $data['BACKREF'] = $this->getReturnUrl();
+        }
+
         if ($this->getMerchName()) {
             $data['MERCH_NAME'] = $this->getMerchName();
         }
@@ -60,8 +63,8 @@ class AuthorizeRequest extends AbstractRequest
             $data['LANG'] = $this->getLang();
         }
 
-        if ($this->getName()) {
-            $data['NAME'] = $this->getName();
+        if ($this->getCustomerName()) {
+            $data['NAME'] = $this->getCustomerName();
         }
 
         if ($this->getMInfo()) {
@@ -76,21 +79,9 @@ class AuthorizeRequest extends AbstractRequest
             $data['DESC'],
             $data['TERMINAL'],
             $data['TRTYPE'],
-            $data['BACKREF'],
         ]);
 
         return $data;
-    }
-
-    /**
-     * Send the data and create response.
-     *
-     * @param array $data The request data
-     * @return PurchaseResponse
-     */
-    public function sendData($data)
-    {
-        return $this->response = new PurchaseResponse($this, $data);
     }
 
     /**
@@ -101,10 +92,6 @@ class AuthorizeRequest extends AbstractRequest
      */
     protected function validateAuthorizationSpecificFields()
     {
-        if (empty($this->getReturnUrl())) {
-            throw new \InvalidArgumentException('Return URL (BACKREF) is required for authorization');
-        }
-
         // Validate field lengths
         $this->validateFieldLengths();
 
@@ -121,5 +108,100 @@ class AuthorizeRequest extends AbstractRequest
         if ($currency && strlen($currency) !== 3) {
             throw new \InvalidArgumentException('Currency must be exactly 3 characters');
         }
+    }
+
+    /**
+     * Send the data and create response.
+     *
+     * @param array $data The request data
+     * @return AuthorizeResponse
+     */
+    public function sendData($data)
+    {
+        return $this->response = new AuthorizeResponse($this, $data);
+    }
+
+    /**
+     * Get additional getter/setter methods for authorization-specific fields
+     */
+
+    public function getMerchName()
+    {
+        return $this->getParameter('merchName');
+    }
+
+    public function setMerchName($value)
+    {
+        return $this->setParameter('merchName', $value);
+    }
+
+    public function getMerchUrl()
+    {
+        return $this->getParameter('merchUrl');
+    }
+
+    public function setMerchUrl($value)
+    {
+        return $this->setParameter('merchUrl', $value);
+    }
+
+    public function getEmail()
+    {
+        return $this->getParameter('email');
+    }
+
+    public function setEmail($value)
+    {
+        return $this->setParameter('email', $value);
+    }
+
+    public function getCountry()
+    {
+        return $this->getParameter('country');
+    }
+
+    public function setCountry($value)
+    {
+        return $this->setParameter('country', $value);
+    }
+
+    public function getMerchGmt()
+    {
+        return $this->getParameter('merchGmt');
+    }
+
+    public function setMerchGmt($value)
+    {
+        return $this->setParameter('merchGmt', $value);
+    }
+
+    public function getLang()
+    {
+        return $this->getParameter('lang');
+    }
+
+    public function setLang($value)
+    {
+        return $this->setParameter('lang', $value);
+    }
+
+    public function getCustomerName()
+    {
+        return $this->getParameter('name');
+    }
+
+    public function setCustomerName($value)
+    {
+        return $this->setParameter('name', $value);
+    }
+
+    public function getTrtype()
+    {
+        return $this->getParameter('trtype');
+    }
+
+    public function setTrtype($value)
+    {
+        return $this->setParameter('trtype', $value);
     }
 }

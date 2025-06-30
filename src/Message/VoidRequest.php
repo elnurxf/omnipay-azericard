@@ -54,15 +54,19 @@ class VoidRequest extends AbstractRequest
     }
 
     /**
-     * Validate void-specific required fields.
+     * Validate void specific required fields.
      *
      * @return void
      * @throws \InvalidArgumentException When required fields are missing
      */
     protected function validateVoidSpecificFields()
     {
-        if (empty($this->getRRN()) && empty($this->getIntRef())) {
-            throw new \InvalidArgumentException('Either RRN or INT_REF is required for void transactions');
+        if (empty($this->getRRN())) {
+            throw new \InvalidArgumentException('RRN is required for void transactions');
+        }
+
+        if (empty($this->getIntRef())) {
+            throw new \InvalidArgumentException('INT_REF is required for void transactions');
         }
     }
 

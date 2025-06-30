@@ -60,8 +60,8 @@ class PurchaseRequest extends AbstractRequest
             $data['LANG'] = $this->getLang();
         }
 
-        if ($this->getName()) {
-            $data['NAME'] = $this->getName();
+        if ($this->getCustomerName()) {
+            $data['NAME'] = $this->getCustomerName();
         }
 
         if ($this->getMInfo()) {
@@ -127,5 +127,15 @@ class PurchaseRequest extends AbstractRequest
     public function sendData($data)
     {
         return $this->response = new PurchaseResponse($this, $data);
+    }
+
+    public function getCustomerName()
+    {
+        return $this->getParameter('name');
+    }
+
+    public function setCustomerName($value)
+    {
+        return $this->setParameter('name', $value);
     }
 }

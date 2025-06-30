@@ -4,7 +4,7 @@
 
 This package provides AzeriCard e-commerce gateway integration with support for 3D Secure, refunds, and signature verification.
 
-> Built and maintained by [Elnur Akhudov](mailto:elnurxf@gmail.com)
+> Built and maintained by [Elnur Akhundov](mailto:elnurxf@gmail.com)
 
 ---
 
@@ -33,7 +33,7 @@ $gateway->setTestMode(true); // or false for production
 $response = $gateway->purchase([
     'amount'         => '20.00',
     'currency'       => 'AZN',
-    'transactionId'  => 'ORDER12345',
+    'transactionId'  => '12345',
     'returnUrl'      => route('payment.callback'),
     'description'    => 'Order #12345',
     'email'          => 'customer@example.com',
@@ -69,6 +69,8 @@ if ($response->isRedirect()) {
     echo "Authorization Error: " . $response->getMessage();
 }
 ```
+
+> **Note**: Authorization requests now support all standard parameters and properly handle 3D Secure redirects just like purchase requests.
 
 ---
 
@@ -133,7 +135,7 @@ if ($response->isSuccessful()) {
 $response = $gateway->refund([
     'amount'        => '10.00', // Refund amount (can be partial)
     'currency'      => 'AZN',
-    'transactionId' => 'ORDER12345', // Original transaction ID
+    'transactionId' => '12345', // Original transaction ID
     'rrn'           => '317276406077', // RRN from original transaction
     'intRef'        => 'ABC123XYZ987', // INT_REF from original transaction
 ])->send();
@@ -171,7 +173,7 @@ if ($response->isSuccessful()) {
 
 ```php
 $response = $gateway->status([
-    'transactionId' => 'ORDER12345',
+    'transactionId' => '12345',
     'rrn'           => '317276406077',
     'intRef'        => 'ABC123XYZ987',
 ])->send();
@@ -193,7 +195,7 @@ if ($response->isSuccessful()) {
 // Step 1: Authorization
 $authResponse = $gateway->authorize([
     'amount' => '100.00',
-    'transactionId' => 'ORDER12345',
+    'transactionId' => '12345',
     'returnUrl' => route('auth.callback'),
     // ... other parameters
 ])->send();
@@ -207,14 +209,14 @@ if ($callbackResponse->isSuccessful()) {
     // Step 3a: Capture the full amount
     $captureResponse = $gateway->completeSale([
         'amount' => '100.00',
-        'transactionId' => 'ORDER12345',
+        'transactionId' => '12345',
         'rrn' => $rrn,
         'intRef' => $intRef,
     ])->send();
     
     // OR Step 3b: Void the authorization
     $voidResponse = $gateway->void([
-        'transactionId' => 'ORDER12345',
+        'transactionId' => '12345',
         'rrn' => $rrn,
         'intRef' => $intRef,
     ])->send();
@@ -234,13 +236,14 @@ The gateway signs and verifies all transactions using **RSA-SHA256**. Make sure 
 
 ## Roadmap / TODO
 
-- [x] Purchase (TRTYPE 1)
-- [x] Authorization/Pre-Auth (TRTYPE 0)
-- [x] Sales completion/Capture (TRTYPE 21)
-- [x] Refund (TRTYPE 22)
-- [x] Status check (TRTYPE 90)
-- [x] Void authorization
-- [x] Verify P_SIGN signatures
+- [x] Purchase (TRTYPE 1) - Direct payment with 3D Secure
+- [x] Authorization/Pre-Auth (TRTYPE 0) - Reserve funds with 3D Secure
+- [x] Sales completion/Capture (TRTYPE 21) - Capture pre-authorized funds
+- [x] Refund (TRTYPE 22) - Full and partial refunds
+- [x] Status check (TRTYPE 90) - Transaction status inquiry
+- [x] Void authorization (TRTYPE 24) - Cancel pre-authorization
+- [x] Verify P_SIGN signatures - RSA-SHA256 signature verification
+- [x] Complete authorization workflow - Pre-auth → 3D Secure → Capture/Void
 - [ ] Tokenization support
 - [ ] Recurring payments
 - [ ] Multi-currency support enhancement
@@ -249,4 +252,4 @@ The gateway signs and verifies all transactions using **RSA-SHA256**. Make sure 
 
 ## License
 
-MIT © [Elnur Akhudov](mailto:elnurxf@gmail.com)
+MIT © [Elnur Akhundov](mailto:elnurxf@gmail.com)

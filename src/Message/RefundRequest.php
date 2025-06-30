@@ -23,7 +23,7 @@ class RefundRequest extends AbstractRequest
 
         $data = [
             'AMOUNT'        => $amount,
-            'CURRENCY'      => Constants::CURRENCY_AZN,
+            'CURRENCY'      => $this->getCurrency() ?: Constants::CURRENCY_AZN,
             'ORDER'         => $this->getTransactionId(),
             'RRN'           => $this->getRRN(),
             'INT_REF'       => $this->getIntRef(),
@@ -35,10 +35,10 @@ class RefundRequest extends AbstractRequest
         ];
 
         $data['P_SIGN'] = $this->sign([
-            $amount,
-            $data['CURRENCY'],
             $data['TERMINAL'],
             $data['TRTYPE'],
+            $data['AMOUNT'],
+            $data['CURRENCY'],
             $data['ORDER'],
             $data['RRN'],
             $data['INT_REF'],
@@ -59,7 +59,7 @@ class RefundRequest extends AbstractRequest
     }
 
     /**
-     * Validate refund-specific required fields.
+     * Validate refund specific required fields.
      *
      * @return void
      * @throws \InvalidArgumentException When required fields are missing
@@ -67,11 +67,11 @@ class RefundRequest extends AbstractRequest
     protected function validateRefundSpecificFields()
     {
         if (empty($this->getRRN())) {
-            throw new \InvalidArgumentException('RRN is required for refunds');
+            throw new \InvalidArgumentException('RRN is required for refund transactions');
         }
 
         if (empty($this->getIntRef())) {
-            throw new \InvalidArgumentException('INT_REF is required for refunds');
+            throw new \InvalidArgumentException('INT_REF is required for refund transactions');
         }
     }
 
