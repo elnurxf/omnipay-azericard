@@ -4,10 +4,10 @@ namespace Omnipay\AzeriCard\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 
-class CompletePurchaseResponse extends AbstractResponse
+class CompleteSaleResponse extends AbstractResponse
 {
     /**
-     * Check if the purchase completion was successful.
+     * Check if the complete sale request was successful.
      *
      * @return bool True if successful
      */
@@ -34,9 +34,9 @@ class CompletePurchaseResponse extends AbstractResponse
     public function getMessage()
     {
         if (! $this->isSuccessful()) {
-            return $this->data['DESC'] ?? 'Transaction failed';
+            return $this->data['DESC'] ?? 'Sale completion failed';
         }
-        return $this->data['DESC'] ?? 'Transaction successful';
+        return $this->data['DESC'] ?? 'Sale completed successfully';
     }
 
     /**
@@ -57,5 +57,25 @@ class CompletePurchaseResponse extends AbstractResponse
     public function getRRN()
     {
         return $this->data['RRN'] ?? null;
+    }
+
+    /**
+     * Get the approval code.
+     *
+     * @return string|null The approval code
+     */
+    public function getApprovalCode()
+    {
+        return $this->data['APPROVAL'] ?? null;
+    }
+
+    /**
+     * Get the amount.
+     *
+     * @return string|null The amount
+     */
+    public function getAmount()
+    {
+        return $this->data['AMOUNT'] ?? null;
     }
 }

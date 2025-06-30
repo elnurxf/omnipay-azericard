@@ -13,11 +13,21 @@ use Omnipay\Common\AbstractGateway;
 
 class Gateway extends AbstractGateway
 {
+    /**
+     * Get the gateway display name.
+     *
+     * @return string The gateway name
+     */
     public function getName()
     {
         return 'AzeriCard';
     }
 
+    /**
+     * Get the default parameters for this gateway.
+     *
+     * @return array Default parameters
+     */
     public function getDefaultParameters()
     {
         return [
@@ -28,36 +38,78 @@ class Gateway extends AbstractGateway
         ];
     }
 
+    /**
+     * Create an authorize request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function authorize(array $parameters = [])
     {
         return $this->createRequest(AuthorizeRequest::class, $parameters);
     }
 
+    /**
+     * Create a purchase request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function purchase(array $parameters = [])
     {
         return $this->createRequest(PurchaseRequest::class, $parameters);
     }
 
+    /**
+     * Create a complete purchase request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function completePurchase(array $parameters = [])
     {
         return $this->createRequest(CompletePurchaseRequest::class, $parameters);
     }
 
+    /**
+     * Create a refund request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function refund(array $parameters = [])
     {
         return $this->createRequest(RefundRequest::class, $parameters);
     }
 
+    /**
+     * Create a complete sale request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function completeSale(array $parameters = [])
     {
         return $this->createRequest(CompleteSaleRequest::class, $parameters);
     }
 
+    /**
+     * Create a status check request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function status(array $parameters = [])
     {
         return $this->createRequest(StatusRequest::class, $parameters);
     }
 
+    /**
+     * Create a void request.
+     *
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
     public function void(array $parameters = [])
     {
         return $this->createRequest(VoidRequest::class, $parameters);
@@ -92,11 +144,6 @@ class Gateway extends AbstractGateway
     public function setPublicKeyPath($value)
     {
         return $this->setParameter('publicKeyPath', $value);
-    }
-
-    public function completePurchase(array $options = [])
-    {
-        return $this->createRequest('\Omnipay\AzeriCard\Message\CompletePurchaseRequest', $options);
     }
 
     /**

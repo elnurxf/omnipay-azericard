@@ -6,6 +6,12 @@ use Omnipay\AzeriCard\Constants;
 
 class PurchaseRequest extends AbstractRequest
 {
+    /**
+     * Get the purchase request data.
+     *
+     * @return array The request data
+     * @throws \InvalidArgumentException When validation fails
+     */
     public function getData()
     {
         $this->validate('amount', 'terminalId');
@@ -76,6 +82,12 @@ class PurchaseRequest extends AbstractRequest
         return $data;
     }
 
+    /**
+     * Validate purchase-specific required fields.
+     *
+     * @return void
+     * @throws \InvalidArgumentException When validation fails
+     */
     protected function validatePurchaseSpecificFields()
     {
         if (empty($this->getBackref()) && empty($this->getReturnUrl())) {
@@ -106,6 +118,12 @@ class PurchaseRequest extends AbstractRequest
         }
     }
 
+    /**
+     * Send the data and create response.
+     *
+     * @param array $data The request data
+     * @return PurchaseResponse
+     */
     public function sendData($data)
     {
         return $this->response = new PurchaseResponse($this, $data);
