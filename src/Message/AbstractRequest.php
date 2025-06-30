@@ -78,7 +78,7 @@ abstract class AbstractRequest extends BaseRequest
     {
         return $this->getTestMode()
         ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
-        : 'https://secure.azericard.com/cgi-bin/cgi_link';
+        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
     }
 
     public function getTerminalId()
