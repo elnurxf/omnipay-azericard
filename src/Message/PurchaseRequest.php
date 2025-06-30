@@ -8,47 +8,102 @@ class PurchaseRequest extends AbstractRequest
 {
     public function getData()
     {
-        $this->validate('amount', 'transactionId', 'returnUrl', 'terminalId');
+        $this->validate('amount', 'terminalId');
+        $this->validatePurchaseSpecificFields();
 
-        $timestamp = $this->generateTimestamp();
-        $nonce     = $this->generateNonce();
+        $timestamp = $this->getTimestamp() ?: $this->generateTimestamp();
+        $nonce     = $this->getNonce() ?: $this->generateNonce();
         $amount    = $this->formatAmount($this->getAmount());
+        $order     = $this->getOrder() ?: $this->getTransactionId();
 
         $data = [
             'AMOUNT'        => $amount,
-            'CURRENCY'      => Constants::CURRENCY_AZN,
-            'ORDER'         => $this->getTransactionId(),
-            'DESC'          => $this->getDescription() ?: $this->getTransactionId(),
-            'MERCH_URL'     => $this->getReturnUrl(),
+            'CURRENCY'      => $this->getCurrency() ?: Constants::CURRENCY_AZN,
+            'ORDER'         => $order,
+            'DESC'          => $this->getDescription() ?: 'Payment',
             'TERMINAL'      => $this->getTerminalId(),
-            'EMAIL'         => $this->getParameter('email'),
-            'TRTYPE'        => Constants::TRTYPE_PURCHASE,
-            'COUNTRY'       => Constants::COUNTRY_AZ,
-            'MERCH_GMT'     => Constants::TIMEZONE_AZ,
+            'TRTYPE'        => $this->getTrtype() ?: Constants::TRTYPE_PURCHASE,
+            'BACKREF'       => $this->getBackref() ?: $this->getReturnUrl(),
             'TIMESTAMP'     => $timestamp,
             'NONCE'         => $nonce,
-            'LANG'          => $this->getParameter('lang') ?: Constants::LANG_EN,
-            'BACKREF'       => $this->getReturnUrl(),
-            'NAME'          => $this->getParameter('name'),
             'MAC_KEY_INDEX' => 0,
         ];
 
-        // Remove null values
-        $data = array_filter($data, function ($value) {
-            return $value !== null && $value !== '';
-        });
+        // Add optional fields if provided
+        if ($this->getMerchName()) {
+            $data['MERCH_NAME'] = $this->getMerchName();
+        }
 
+        if ($this->getMerchUrl()) {
+            $data['MERCH_URL'] = $this->getMerchUrl();
+        }
+
+        if ($this->getEmail()) {
+            $data['EMAIL'] = $this->getEmail();
+        }
+
+        if ($this->getCountry()) {
+            $data['COUNTRY'] = $this->getCountry();
+        }
+
+        if ($this->getMerchGmt()) {
+            $data['MERCH_GMT'] = $this->getMerchGmt();
+        }
+
+        if ($this->getLang()) {
+            $data['LANG'] = $this->getLang();
+        }
+
+        if ($this->getName()) {
+            $data['NAME'] = $this->getName();
+        }
+
+        if ($this->getMInfo()) {
+            $data['M_INFO'] = $this->getMInfo();
+        }
+
+        // Generate signature with core fields
         $data['P_SIGN'] = $this->sign([
             $amount,
             $data['CURRENCY'],
+            $order,
+            $data['DESC'],
             $data['TERMINAL'],
             $data['TRTYPE'],
-            $timestamp,
-            $nonce,
-            $data['MERCH_URL'],
+            $data['BACKREF'],
         ]);
 
         return $data;
+    }
+
+    protected function validatePurchaseSpecificFields()
+    {
+        if (empty($this->getBackref()) && empty($this->getReturnUrl())) {
+            throw new \InvalidArgumentException('Return URL (BACKREF) is required for purchases');
+        }
+
+        // Validate field lengths
+        $this->validateFieldLengths();
+
+        // Validate ORDER field is numeric
+        $this->validateOrderField();
+
+        // Validate amount is positive
+        if ($this->getAmount() <= 0) {
+            throw new \InvalidArgumentException('Amount must be greater than zero');
+        }
+
+        // Validate currency format
+        $currency = $this->getCurrency();
+        if ($currency && strlen($currency) !== 3) {
+            throw new \InvalidArgumentException('Currency must be exactly 3 characters');
+        }
+
+        // Validate transaction type
+        $trtype = $this->getTrtype();
+        if ($trtype !== null && ! in_array($trtype, [Constants::TRTYPE_PRE_AUTH, Constants::TRTYPE_AUTH])) {
+            throw new \InvalidArgumentException('Invalid transaction type');
+        }
     }
 
     public function sendData($data)

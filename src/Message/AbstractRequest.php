@@ -4,13 +4,26 @@ namespace Omnipay\AzeriCard\Message;
 
 use Omnipay\Common\Message\AbstractRequest as BaseRequest;
 
+// Added field validation methods to the AbstractRequest class.
 abstract class AbstractRequest extends BaseRequest
 {
+    /**
+     * Generate a timestamp in the format YmdHis.
+     *
+     * @return string The generated timestamp in GMT (UTC) time
+     */
     protected function generateTimestamp()
     {
         return gmdate('YmdHis');
     }
 
+    /**
+     * Generate a random nonce for cryptographic operations.
+     *
+     * @param int $length The length of the nonce (must be even)
+     * @return string Hexadecimal representation of the generated nonce
+     * @throws \InvalidArgumentException When length is not even
+     */
     protected function generateNonce($length = 16)
     {
         if ($length % 2 !== 0) {
@@ -19,6 +32,14 @@ abstract class AbstractRequest extends BaseRequest
         return bin2hex(random_bytes($length / 2));
     }
 
+    /**
+     * Sign the given fields using the private key.
+     *
+     * @param array $fields Array of field values to sign
+     * @return string Hexadecimal representation of the signature
+     * @throws \InvalidArgumentException When private key validation fails
+     * @throws \RuntimeException When signing fails
+     */
     protected function sign(array $fields)
     {
         $privateKeyPath = $this->getParameter('privateKeyPath');
@@ -36,6 +57,13 @@ abstract class AbstractRequest extends BaseRequest
         return bin2hex($signature);
     }
 
+    /**
+     * Validate that the private key file exists and is readable.
+     *
+     * @param string $privateKeyPath Path to the private key file
+     * @return void
+     * @throws \InvalidArgumentException When validation fails
+     */
     protected function validatePrivateKey($privateKeyPath)
     {
         if (empty($privateKeyPath)) {
@@ -51,6 +79,13 @@ abstract class AbstractRequest extends BaseRequest
         }
     }
 
+    /**
+     * Load the private key content from file.
+     *
+     * @param string $privateKeyPath Path to the private key file
+     * @return string The private key content
+     * @throws \RuntimeException When file reading fails
+     */
     protected function loadPrivateKey($privateKeyPath)
     {
         $privateKey = file_get_contents($privateKeyPath);
@@ -60,6 +95,12 @@ abstract class AbstractRequest extends BaseRequest
         return $privateKey;
     }
 
+    /**
+     * Build the signature source string from field values.
+     *
+     * @param array $fields Array of field values
+     * @return string The concatenated signature source
+     */
     protected function buildSignatureSource(array $fields)
     {
         $source = '';
@@ -69,45 +110,192 @@ abstract class AbstractRequest extends BaseRequest
         return $source;
     }
 
+    /**
+     * Format amount to two decimal places.
+     *
+     * @param mixed $amount The amount to format
+     * @return string Formatted amount with 2 decimal places
+     */
     protected function formatAmount($amount)
     {
         return number_format((float) $amount, 2, '.', '');
     }
 
+    /**
+     * Get the API endpoint URL based on test mode.
+     *
+     * @return string The endpoint URL
+     */
     public function getEndpoint()
     {
         return $this->getTestMode()
         ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
-        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
+        : 'https://secure.azericard.com/cgi-bin/cgi_link';
     }
 
+    /**
+     * Get the terminal ID.
+     *
+     * @return string|null The terminal ID
+     */
     public function getTerminalId()
     {
         return $this->getParameter('terminalId');
     }
 
+    /**
+     * Set the terminal ID.
+     *
+     * @param string $value The terminal ID
+     * @return $this
+     */
     public function setTerminalId($value)
     {
         return $this->setParameter('terminalId', $value);
     }
 
+    /**
+     * Get the private key file path.
+     *
+     * @return string|null The private key file path
+     */
     public function getPrivateKeyPath()
     {
         return $this->getParameter('privateKeyPath');
     }
 
+    /**
+     * Set the private key file path.
+     *
+     * @param string $value The private key file path
+     * @return $this
+     */
     public function setPrivateKeyPath($value)
     {
         return $this->setParameter('privateKeyPath', $value);
     }
 
+    /**
+     * Get the public key file path.
+     *
+     * @return string|null The public key file path
+     */
     public function getPublicKeyPath()
     {
         return $this->getParameter('publicKeyPath');
     }
 
+    /**
+     * Set the public key file path.
+     *
+     * @param string $value The public key file path
+     * @return $this
+     */
     public function setPublicKeyPath($value)
     {
         return $this->setParameter('publicKeyPath', $value);
+    }
+
+    /**
+     * Get the merchant information.
+     *
+     * @return string|null The merchant information
+     */
+    public function getMInfo()
+    {
+        return $this->getParameter('mInfo');
+    }
+
+    /**
+     * Set the merchant information.
+     *
+     * @param string $value The merchant information
+     * @return $this
+     */
+    public function setMInfo($value)
+    {
+        return $this->setParameter('mInfo', $value);
+    }
+
+    /**
+     * Validate field lengths according to AzeriCard specifications.
+     *
+     * @return void
+     * @throws \InvalidArgumentException When field length validation fails
+     */
+    protected function validateFieldLengths()
+    {
+        $validations = [
+            'amount'      => ['max' => 12, 'name' => 'AMOUNT'],
+            'currency'    => ['max' => 3, 'min' => 3, 'name' => 'CURRENCY'],
+            'order'       => ['max' => 32, 'min' => 6, 'name' => 'ORDER'],
+            'description' => ['max' => 50, 'min' => 1, 'name' => 'DESC'],
+            'merchName'   => ['max' => 50, 'min' => 1, 'name' => 'MERCH_NAME'],
+            'merchUrl'    => ['max' => 250, 'min' => 1, 'name' => 'MERCH_URL'],
+            'email'       => ['max' => 80, 'name' => 'EMAIL'],
+            'trtype'      => ['max' => 1, 'name' => 'TRTYPE'],
+            'country'     => ['max' => 2, 'min' => 2, 'name' => 'COUNTRY'],
+            'merchGmt'    => ['max' => 5, 'min' => 1, 'name' => 'MERCH_GMT'],
+            'backref'     => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
+            'timestamp'   => ['max' => 14, 'min' => 14, 'name' => 'TIMESTAMP'],
+            'nonce'       => ['max' => 64, 'min' => 1, 'name' => 'NONCE'],
+            'lang'        => ['max' => 2, 'min' => 2, 'name' => 'LANG'],
+            'pSign'       => ['max' => 256, 'min' => 1, 'name' => 'P_SIGN'],
+            'name'        => ['max' => 45, 'min' => 2, 'name' => 'NAME'],
+            'mInfo'       => ['max' => 35000, 'name' => 'M_INFO'],
+        ];
+
+        foreach ($validations as $field => $rules) {
+            $value = $this->getParameter($field);
+            if ($value !== null) {
+                $length = strlen($value);
+
+                if (isset($rules['min']) && $length < $rules['min']) {
+                    throw new \InvalidArgumentException(
+                        sprintf('%s must be at least %d characters long', $rules['name'], $rules['min'])
+                    );
+                }
+
+                if (isset($rules['max']) && $length > $rules['max']) {
+                    throw new \InvalidArgumentException(
+                        sprintf('%s must not exceed %d characters', $rules['name'], $rules['max'])
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate that ORDER field is numeric and meets requirements.
+     *
+     * @return void
+     * @throws \InvalidArgumentException When ORDER field is not numeric
+     */
+    protected function validateOrderField()
+    {
+        $order = $this->getOrder();
+        if ($order && ! is_numeric($order)) {
+            throw new \InvalidArgumentException('ORDER field must be numeric');
+        }
+    }
+
+    /**
+     * Generate a secure nonce with proper length validation.
+     *
+     * @param int $length The length of the nonce (must be between 8 and 32, and even)
+     * @return string Hexadecimal representation of the generated nonce
+     * @throws \InvalidArgumentException When length is invalid
+     */
+    protected function generateSecureNonce($length = 16)
+    {
+        if ($length < 8 || $length > 32) {
+            throw new \InvalidArgumentException('Nonce length must be between 8 and 32 characters');
+        }
+
+        if ($length % 2 !== 0) {
+            throw new \InvalidArgumentException('Nonce length must be even');
+        }
+
+        return bin2hex(random_bytes($length / 2));
     }
 }

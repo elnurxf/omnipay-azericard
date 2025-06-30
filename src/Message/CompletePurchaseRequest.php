@@ -4,6 +4,13 @@ namespace Omnipay\AzeriCard\Message;
 
 class CompletePurchaseRequest extends AbstractRequest
 {
+    /**
+     * Get the request data from HTTP callback.
+     *
+     * @return array The callback data
+     * @throws \InvalidArgumentException When validation fails
+     * @throws \RuntimeException When signature verification fails
+     */
     public function getData()
     {
         $data = $this->httpRequest->request->all();
@@ -19,11 +26,24 @@ class CompletePurchaseRequest extends AbstractRequest
         return $data;
     }
 
+    /**
+     * Send the data and create response.
+     *
+     * @param array $data The request data
+     * @return CompletePurchaseResponse
+     */
     public function sendData($data)
     {
         return $this->response = new CompletePurchaseResponse($this, $data);
     }
 
+    /**
+     * Validate that required callback fields are present.
+     *
+     * @param array $data The callback data
+     * @return void
+     * @throws \InvalidArgumentException When required fields are missing
+     */
     protected function validateCallbackData(array $data)
     {
         $required = ['ACTION', 'ORDER', 'INT_REF'];
@@ -34,6 +54,14 @@ class CompletePurchaseRequest extends AbstractRequest
         }
     }
 
+    /**
+     * Verify the signature of callback data.
+     *
+     * @param array $data The callback data
+     * @return bool True if signature is valid
+     * @throws \InvalidArgumentException When signature validation fails
+     * @throws \RuntimeException When signature verification fails
+     */
     protected function verifySignature(array $data)
     {
         $publicKeyPath = $this->getParameter('publicKeyPath');

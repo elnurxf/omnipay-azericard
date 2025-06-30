@@ -2,29 +2,36 @@
 
 namespace Omnipay\AzeriCard\Message;
 
+use Omnipay\AzeriCard\Constants;
+
 class VoidRequest extends AbstractRequest
 {
+    /**
+     * Get the void request data.
+     *
+     * @return array The request data
+     * @throws \InvalidArgumentException When validation fails
+     */
     public function getData()
     {
+        $this->validate('transactionId', 'terminalId');
+        $this->validateVoidSpecificFields();
+
         $timestamp = $this->generateTimestamp();
         $nonce     = $this->generateNonce();
-        $amount    = number_format($this->getAmount(), 2, '.', '');
 
         $data = [
-            'AMOUNT'    => $amount,
-            'CURRENCY'  => 'AZN',
-            'ORDER'     => $this->getTransactionId(),
-            'RRN'       => $this->getParameter('rrn'),
-            'INT_REF'   => $this->getParameter('intRef'),
-            'TERMINAL'  => $this->getParameter('terminalId'),
-            'TRTYPE'    => '24',
-            'TIMESTAMP' => $timestamp,
-            'NONCE'     => $nonce,
+            'ORDER'         => $this->getTransactionId(),
+            'RRN'           => $this->getRRN(),
+            'INT_REF'       => $this->getIntRef(),
+            'TERMINAL'      => $this->getTerminalId(),
+            'TRTYPE'        => Constants::TRTYPE_VOID,
+            'TIMESTAMP'     => $timestamp,
+            'NONCE'         => $nonce,
+            'MAC_KEY_INDEX' => 0,
         ];
 
         $data['P_SIGN'] = $this->sign([
-            $amount,
-            $data['CURRENCY'],
             $data['TERMINAL'],
             $data['TRTYPE'],
             $data['ORDER'],
@@ -35,8 +42,73 @@ class VoidRequest extends AbstractRequest
         return $data;
     }
 
+    /**
+     * Send the data and create response.
+     *
+     * @param array $data The request data
+     * @return VoidResponse
+     */
     public function sendData($data)
     {
-        return $this->response = new PurchaseResponse($this, $data);
+        return $this->response = new VoidResponse($this, $data);
+    }
+
+    /**
+     * Validate void specific required fields.
+     *
+     * @return void
+     * @throws \InvalidArgumentException When required fields are missing
+     */
+    protected function validateVoidSpecificFields()
+    {
+        if (empty($this->getRRN())) {
+            throw new \InvalidArgumentException('RRN is required for void operations');
+        }
+
+        if (empty($this->getIntRef())) {
+            throw new \InvalidArgumentException('INT_REF is required for void operations');
+        }
+    }
+
+    /**
+     * Get the RRN (Retrieval Reference Number).
+     *
+     * @return string|null The RRN
+     */
+    public function getRRN()
+    {
+        return $this->getParameter('rrn');
+    }
+
+    /**
+     * Set the RRN (Retrieval Reference Number).
+     *
+     * @param string $value The RRN
+     * @return $this
+     */
+    public function setRRN($value)
+    {
+        return $this->setParameter('rrn', $value);
+    }
+
+    /**
+     * Get the internal reference number.
+     *
+     * @return string|null The internal reference number
+     */
+    public function getIntRef()
+    {
+        return $this->getParameter('intRef');
+    }
+
+    /**
+     * Set the internal reference number.
+     *
+     * @param string $value The internal reference number
+     * @return $this
+     */
+    public function setIntRef($value)
+    {
+        return $this->setParameter('intRef', $value);
     }
 }

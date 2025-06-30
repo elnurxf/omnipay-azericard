@@ -6,6 +6,12 @@ use Omnipay\AzeriCard\Constants;
 
 class RefundRequest extends AbstractRequest
 {
+    /**
+     * Get the refund request data.
+     *
+     * @return array The request data
+     * @throws \InvalidArgumentException When validation fails
+     */
     public function getData()
     {
         $this->validate('amount', 'transactionId', 'terminalId');
@@ -41,11 +47,23 @@ class RefundRequest extends AbstractRequest
         return $data;
     }
 
+    /**
+     * Send the data and create response.
+     *
+     * @param array $data The request data
+     * @return RefundResponse
+     */
     public function sendData($data)
     {
         return $this->response = new RefundResponse($this, $data);
     }
 
+    /**
+     * Validate refund-specific required fields.
+     *
+     * @return void
+     * @throws \InvalidArgumentException When required fields are missing
+     */
     protected function validateRefundSpecificFields()
     {
         if (empty($this->getRRN())) {
@@ -57,21 +75,43 @@ class RefundRequest extends AbstractRequest
         }
     }
 
+    /**
+     * Get the RRN (Retrieval Reference Number).
+     *
+     * @return string|null The RRN
+     */
     public function getRRN()
     {
         return $this->getParameter('rrn');
     }
 
+    /**
+     * Set the RRN (Retrieval Reference Number).
+     *
+     * @param string $value The RRN
+     * @return $this
+     */
     public function setRRN($value)
     {
         return $this->setParameter('rrn', $value);
     }
 
+    /**
+     * Get the internal reference number.
+     *
+     * @return string|null The internal reference number
+     */
     public function getIntRef()
     {
         return $this->getParameter('intRef');
     }
 
+    /**
+     * Set the internal reference number.
+     *
+     * @param string $value The internal reference number
+     * @return $this
+     */
     public function setIntRef($value)
     {
         return $this->setParameter('intRef', $value);
