@@ -2,8 +2,6 @@
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\AzeriCard\Constants;
-
 class CompletePurchaseRequest extends AbstractRequest
 {
     public function getData()
@@ -30,7 +28,7 @@ class CompletePurchaseRequest extends AbstractRequest
     {
         $required = ['ACTION', 'ORDER', 'INT_REF'];
         foreach ($required as $field) {
-            if (!isset($data[$field])) {
+            if (! isset($data[$field])) {
                 throw new \InvalidArgumentException("Missing required callback field: {$field}");
             }
         }
@@ -39,7 +37,7 @@ class CompletePurchaseRequest extends AbstractRequest
     protected function verifySignature(array $data)
     {
         $publicKeyPath = $this->getParameter('publicKeyPath');
-        if (!file_exists($publicKeyPath)) {
+        if (! file_exists($publicKeyPath)) {
             throw new \InvalidArgumentException('Public key file not found');
         }
 

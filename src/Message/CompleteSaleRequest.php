@@ -7,8 +7,8 @@ class CompleteSaleRequest extends AbstractRequest
     public function getData()
     {
         $timestamp = $this->generateTimestamp();
-        $nonce = $this->generateNonce();
-        $amount = number_format($this->getAmount(), 2, '.', '');
+        $nonce     = $this->generateNonce();
+        $amount    = number_format($this->getAmount(), 2, '.', '');
 
         $data = [
             'AMOUNT'    => $amount,

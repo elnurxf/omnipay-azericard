@@ -7,7 +7,7 @@ class StatusRequest extends AbstractRequest
     public function getData()
     {
         $timestamp = $this->generateTimestamp();
-        $nonce = $this->generateNonce();
+        $nonce     = $this->generateNonce();
 
         $data = [
             'TRAN_TRTYPE' => $this->getParameter('originalTrtype'),

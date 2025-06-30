@@ -7,20 +7,20 @@ class CreateCardRequest extends AbstractRequest
     public function getData()
     {
         $timestamp = $this->generateTimestamp();
-        $nonce = $this->generateNonce();
+        $nonce     = $this->generateNonce();
 
         $data = [
-            'ORDER'           => $this->getTransactionId(),
-            'TERMINAL'        => $this->getParameter('terminalId'),
-            'TRTYPE'          => '1',
-            'TOKEN_ACTION'    => 'REGISTER',
-            'CURRENCY'        => 'AZN',
-            'DESC'            => 'Token registration',
-            'MERCH_URL'       => $this->getReturnUrl(),
-            'EMAIL'           => $this->getParameter('email'),
-            'NAME'            => $this->getParameter('name'),
-            'TIMESTAMP'       => $timestamp,
-            'NONCE'           => $nonce,
+            'ORDER'        => $this->getTransactionId(),
+            'TERMINAL'     => $this->getParameter('terminalId'),
+            'TRTYPE'       => '1',
+            'TOKEN_ACTION' => 'REGISTER',
+            'CURRENCY'     => 'AZN',
+            'DESC'         => 'Token registration',
+            'MERCH_URL'    => $this->getReturnUrl(),
+            'EMAIL'        => $this->getParameter('email'),
+            'NAME'         => $this->getParameter('name'),
+            'TIMESTAMP'    => $timestamp,
+            'NONCE'        => $nonce,
         ];
 
         $data['P_SIGN'] = $this->sign([

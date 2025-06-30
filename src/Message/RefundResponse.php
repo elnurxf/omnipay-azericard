@@ -1,10 +1,9 @@
-
 <?php
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\AzeriCard\Constants;
+use Omnipay\Common\Message\AbstractResponse;
 
 class RefundResponse extends AbstractResponse
 {
@@ -20,7 +19,7 @@ class RefundResponse extends AbstractResponse
 
     public function getMessage()
     {
-        if (!$this->isSuccessful()) {
+        if (! $this->isSuccessful()) {
             return $this->data['DESC'] ?? 'Refund failed';
         }
         return $this->data['DESC'] ?? 'Refund successful';
@@ -35,7 +34,7 @@ class RefundResponse extends AbstractResponse
     {
         return $this->data['RRN'] ?? null;
     }
-    
+
     public function getTransactionId()
     {
         return $this->data['ORDER'] ?? null;

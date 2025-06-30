@@ -1,14 +1,13 @@
-
 <?php
 
 namespace Omnipay\AzeriCard;
 
-use Omnipay\Common\AbstractGateway;
-use Omnipay\AzeriCard\Message\PurchaseRequest;
 use Omnipay\AzeriCard\Message\CompletePurchaseRequest;
+use Omnipay\AzeriCard\Message\CompleteSaleRequest;
+use Omnipay\AzeriCard\Message\PurchaseRequest;
 use Omnipay\AzeriCard\Message\RefundRequest;
 use Omnipay\AzeriCard\Message\StatusRequest;
-use Omnipay\AzeriCard\Message\CompleteSaleRequest;
+use Omnipay\Common\AbstractGateway;
 
 class Gateway extends AbstractGateway
 {
@@ -20,10 +19,10 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return [
-            'terminalId' => '',
+            'terminalId'     => '',
             'privateKeyPath' => '',
-            'publicKeyPath' => '',
-            'testMode' => true,
+            'publicKeyPath'  => '',
+            'testMode'       => true,
         ];
     }
 
@@ -41,12 +40,12 @@ class Gateway extends AbstractGateway
     {
         return $this->createRequest(RefundRequest::class, $parameters);
     }
-    
+
     public function completeSale(array $parameters = [])
     {
         return $this->createRequest(CompleteSaleRequest::class, $parameters);
     }
-    
+
     public function status(array $parameters = [])
     {
         return $this->createRequest(StatusRequest::class, $parameters);
@@ -72,7 +71,7 @@ class Gateway extends AbstractGateway
     {
         return $this->setParameter('privateKeyPath', $value);
     }
-    
+
     public function getPublicKeyPath()
     {
         return $this->getParameter('publicKeyPath');

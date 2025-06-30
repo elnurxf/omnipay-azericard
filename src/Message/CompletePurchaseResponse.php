@@ -18,7 +18,7 @@ class CompletePurchaseResponse extends AbstractResponse
 
     public function getMessage()
     {
-        if (!$this->isSuccessful()) {
+        if (! $this->isSuccessful()) {
             return $this->data['DESC'] ?? 'Transaction failed';
         }
         return $this->data['DESC'] ?? 'Transaction successful';
