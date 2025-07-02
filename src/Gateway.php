@@ -115,144 +115,37 @@ class Gateway extends AbstractGateway
         return $this->createRequest(VoidRequest::class, $parameters);
     }
 
-    // Getter/Setter methods for better IDE support
-    public function getTerminalId()
-    {
-        return $this->getParameter('terminalId');
-    }
-
+    /**
+     * Set the terminal ID.
+     *
+     * @param string $value The terminal ID
+     * @return $this
+     */
     public function setTerminalId($value)
     {
         return $this->setParameter('terminalId', $value);
     }
 
-    public function getPrivateKeyPath()
-    {
-        return $this->getParameter('privateKeyPath');
-    }
-
+    /**
+     * Set the private key file path.
+     *
+     * @param string $value The private key file path
+     * @return $this
+     */
     public function setPrivateKeyPath($value)
     {
         return $this->setParameter('privateKeyPath', $value);
     }
 
-    public function getPublicKeyPath()
-    {
-        return $this->getParameter('publicKeyPath');
-    }
-
+    /**
+     * Set the public key file path.
+     *
+     * @param string $value The public key file path
+     * @return $this
+     */
     public function setPublicKeyPath($value)
     {
         return $this->setParameter('publicKeyPath', $value);
     }
 
-    public function getCurrency()
-    {
-        return $this->getParameter('currency');
-    }
-
-    public function setCurrency($value)
-    {
-        return $this->setParameter('currency', $value);
-    }
-
-    public function getCountry()
-    {
-        return $this->getParameter('country');
-    }
-
-    public function setCountry($value)
-    {
-        return $this->setParameter('country', $value);
-    }
-
-    public function getLang()
-    {
-        return $this->getParameter('lang');
-    }
-
-    public function setLang($value)
-    {
-        return $this->setParameter('lang', $value);
-    }
-
-    public function getMerchGmt()
-    {
-        return $this->getParameter('merchGmt');
-    }
-
-    public function setMerchGmt($value)
-    {
-        return $this->setParameter('merchGmt', $value);
-    }
-
-    public function getMerchName()
-    {
-        return $this->getParameter('merchName');
-    }
-
-    public function setMerchName($value)
-    {
-        return $this->setParameter('merchName', $value);
-    }
-
-    public function getMerchUrl()
-    {
-        return $this->getParameter('merchUrl');
-    }
-
-    public function setMerchUrl($value)
-    {
-        return $this->setParameter('merchUrl', $value);
-    }
-
-    public function getEmail()
-    {
-        return $this->getParameter('email');
-    }
-
-    public function setEmail($value)
-    {
-        return $this->setParameter('email', $value);
-    }
-
-    public function getReturnUrl()
-    {
-        return $this->getParameter('returnUrl');
-    }
-
-    public function setReturnUrl($value)
-    {
-        return $this->setParameter('returnUrl', $value);
-    }
-
-    public function getDescription()
-    {
-        return $this->getParameter('description');
-    }
-
-    public function setDescription($value)
-    {
-        return $this->setParameter('description', $value);
-    }
-
-    public function getCustomerName()
-    {
-        return $this->getParameter('name');
-    }
-
-    public function setCustomerName($value)
-    {
-        return $this->setParameter('name', $value);
-    }
-
-    public function getMInfo()
-    {
-        return $this->getParameter('mInfo');
-    }
-
-    public function setMInfo($value)
-    {
-        return $this->setParameter('mInfo', $value);
-    }
 }

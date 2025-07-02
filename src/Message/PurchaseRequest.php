@@ -129,13 +129,4 @@ class PurchaseRequest extends AbstractRequest
         return $this->response = new PurchaseResponse($this, $data);
     }
 
-    public function getCustomerName()
-    {
-        return $this->getParameter('name');
-    }
-
-    public function setCustomerName($value)
-    {
-        return $this->setParameter('name', $value);
-    }
 }

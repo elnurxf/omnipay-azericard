@@ -20,26 +20,4 @@ class Constants
     const CURRENCY_AZN = 'AZN';
     const CURRENCY_USD = 'USD';
     const CURRENCY_EUR = 'EUR';
-
-    // Common countries
-    const COUNTRY_AZERBAIJAN = 'AZ';
-    const COUNTRY_TURKEY     = 'TR';
-
-    // Common languages
-    const LANG_AZERBAIJANI = 'az';
-    const LANG_ENGLISH     = 'en';
-    const LANG_RUSSIAN     = 'ru';
-    const LANG_TURKISH     = 'tr';
-
-    // Legacy language constants for backwards compatibility
-    const LANG_EN = 'en';
-    const LANG_AZ = 'az';
-
-    // Timezone offsets
-    const GMT_AZERBAIJAN = '+4';
-    const GMT_TURKEY     = '+3';
-    const GMT_UTC        = '+0';
-
-    // Legacy timezone constants for backwards compatibility
-    const TIMEZONE_AZ = '+4';
 }

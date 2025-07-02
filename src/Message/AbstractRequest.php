@@ -14,7 +14,8 @@ abstract class AbstractRequest extends BaseRequest
      */
     protected function generateTimestamp()
     {
-        return gmdate('YmdHis');
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        return $date->format('YmdHis');
     }
 
     /**
@@ -105,7 +106,7 @@ abstract class AbstractRequest extends BaseRequest
     {
         $source = '';
         foreach ($fields as $value) {
-            $source .= strlen($value) . $value;
+            $source .= strlen((string) $value) . $value;
         }
         return $source;
     }
@@ -122,99 +123,37 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the API endpoint URL based on test mode.
+     * Validate that ORDER field is numeric and meets requirements.
      *
-     * @return string The endpoint URL
+     * @return void
+     * @throws \InvalidArgumentException When ORDER field is not numeric
      */
-    public function getEndpoint()
+    protected function validateOrderField()
     {
-        return $this->getTestMode()
-        ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
-        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
+        $order = $this->getOrder();
+        if ($order && ! is_numeric($order)) {
+            throw new \InvalidArgumentException('ORDER field must be numeric');
+        }
     }
 
     /**
-     * Get the terminal ID.
+     * Generate a secure nonce with proper length validation.
      *
-     * @return string|null The terminal ID
+     * @param int $length The length of the nonce (must be between 8 and 32, and even)
+     * @return string Hexadecimal representation of the generated nonce
+     * @throws \InvalidArgumentException When length is invalid
      */
-    public function getTerminalId()
+    protected function generateSecureNonce($length = 16)
     {
-        return $this->getParameter('terminalId');
-    }
+        if ($length < 8 || $length > 32) {
+            throw new \InvalidArgumentException('Nonce length must be between 8 and 32 characters');
+        }
 
-    /**
-     * Set the terminal ID.
-     *
-     * @param string $value The terminal ID
-     * @return $this
-     */
-    public function setTerminalId($value)
-    {
-        return $this->setParameter('terminalId', $value);
-    }
+        if ($length % 2 !== 0) {
+            throw new \InvalidArgumentException('Nonce length must be even');
+        }
 
-    /**
-     * Get the private key file path.
-     *
-     * @return string|null The private key file path
-     */
-    public function getPrivateKeyPath()
-    {
-        return $this->getParameter('privateKeyPath');
-    }
-
-    /**
-     * Set the private key file path.
-     *
-     * @param string $value The private key file path
-     * @return $this
-     */
-    public function setPrivateKeyPath($value)
-    {
-        return $this->setParameter('privateKeyPath', $value);
-    }
-
-    /**
-     * Get the public key file path.
-     *
-     * @return string|null The public key file path
-     */
-    public function getPublicKeyPath()
-    {
-        return $this->getParameter('publicKeyPath');
-    }
-
-    /**
-     * Set the public key file path.
-     *
-     * @param string $value The public key file path
-     * @return $this
-     */
-    public function setPublicKeyPath($value)
-    {
-        return $this->setParameter('publicKeyPath', $value);
-    }
-
-    /**
-     * Get the merchant information.
-     *
-     * @return string|null The merchant information
-     */
-    public function getMInfo()
-    {
-        return $this->getParameter('mInfo');
-    }
-
-    /**
-     * Set the merchant information.
-     *
-     * @param string $value The merchant information
-     * @return $this
-     */
-    public function setMInfo($value)
-    {
-        return $this->setParameter('mInfo', $value);
+        return bin2hex(random_bytes($length / 2));
     }
 
     /**
@@ -266,6 +205,69 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
+     * Get the API endpoint URL based on test mode.
+     *
+     * @return string The endpoint URL
+     */
+    public function getEndpoint()
+    {
+        return $this->getTestMode()
+        ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
+        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
+    }
+
+    /**
+     * Get the private key file path.
+     *
+     * @return string|null The private key file path
+     */
+    public function getPrivateKeyPath()
+    {
+        return $this->getParameter('privateKeyPath');
+    }
+
+    /**
+     * Get the public key file path.
+     *
+     * @return string|null The public key file path
+     */
+    public function getPublicKeyPath()
+    {
+        return $this->getParameter('publicKeyPath');
+    }
+
+    /**
+     * Get the terminal ID.
+     *
+     * @return string|null The terminal ID
+     */
+    public function getTerminalId()
+    {
+        return $this->getParameter('terminalId');
+    }
+
+    /**
+     * Get the merchant information.
+     *
+     * @return string|null The merchant information
+     */
+    public function getMInfo()
+    {
+        return $this->getParameter('mInfo');
+    }
+
+    /**
+     * Set the merchant information.
+     *
+     * @param string $value The merchant information
+     * @return $this
+     */
+    public function setMInfo($value)
+    {
+        return $this->setParameter('mInfo', $value);
+    }
+
+    /**
      * Get the order/transaction identifier.
      *
      * @return string|null The order identifier
@@ -284,40 +286,6 @@ abstract class AbstractRequest extends BaseRequest
     public function setOrder($value)
     {
         return $this->setParameter('order', $value);
-    }
-
-    /**
-     * Validate that ORDER field is numeric and meets requirements.
-     *
-     * @return void
-     * @throws \InvalidArgumentException When ORDER field is not numeric
-     */
-    protected function validateOrderField()
-    {
-        $order = $this->getOrder();
-        if ($order && ! is_numeric($order)) {
-            throw new \InvalidArgumentException('ORDER field must be numeric');
-        }
-    }
-
-    /**
-     * Generate a secure nonce with proper length validation.
-     *
-     * @param int $length The length of the nonce (must be between 8 and 32, and even)
-     * @return string Hexadecimal representation of the generated nonce
-     * @throws \InvalidArgumentException When length is invalid
-     */
-    protected function generateSecureNonce($length = 16)
-    {
-        if ($length < 8 || $length > 32) {
-            throw new \InvalidArgumentException('Nonce length must be between 8 and 32 characters');
-        }
-
-        if ($length % 2 !== 0) {
-            throw new \InvalidArgumentException('Nonce length must be even');
-        }
-
-        return bin2hex(random_bytes($length / 2));
     }
 
     /**
@@ -360,5 +328,236 @@ abstract class AbstractRequest extends BaseRequest
     public function setNonce($value)
     {
         return $this->setParameter('nonce', $value);
+    }
+
+    /**
+     * Get the merchant name.
+     *
+     * @return string|null
+     */
+    public function getMerchName()
+    {
+        return $this->getParameter('merchName');
+    }
+
+    /**
+     * Set the merchant name.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMerchName($value)
+    {
+        return $this->setParameter('merchName', $value);
+    }
+
+    /**
+     * Get the merchant URL.
+     *
+     * @return string|null
+     */
+    public function getMerchUrl()
+    {
+        return $this->getParameter('merchUrl');
+    }
+
+    /**
+     * Set the merchant URL.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMerchUrl($value)
+    {
+        return $this->setParameter('merchUrl', $value);
+    }
+
+    /**
+     * Get the merchant email address.
+     *
+     * @return string|null
+     */
+    public function getEmail()
+    {
+        return $this->getParameter('email');
+    }
+
+    /**
+     * Set the merchant email address.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setEmail($value)
+    {
+        return $this->setParameter('email', $value);
+    }
+
+    /**
+     * Get the country code.
+     *
+     * @return string|null
+     */
+    public function getCountry()
+    {
+        return $this->getParameter('country');
+    }
+
+    /**
+     * Set the country code.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setCountry($value)
+    {
+        return $this->setParameter('country', $value);
+    }
+
+    /**
+     * Get the merchant GMT offset.
+     *
+     * @return string|null
+     */
+    public function getMerchGmt()
+    {
+        return $this->getParameter('merchGmt');
+    }
+
+    /**
+     * Set the merchant GMT offset.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMerchGmt($value)
+    {
+        return $this->setParameter('merchGmt', $value);
+    }
+
+    /**
+     * Get the language code.
+     *
+     * @return string|null
+     */
+    public function getLang()
+    {
+        return $this->getParameter('lang');
+    }
+
+    /**
+     * Set the language code.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setLang($value)
+    {
+        return $this->setParameter('lang', $value);
+    }
+
+    /**
+     * Get the customer's full name.
+     *
+     * @return string|null
+     */
+    public function getCustomerName()
+    {
+        return $this->getParameter('name');
+    }
+
+    /**
+     * Set the customer's full name.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setCustomerName($value)
+    {
+        return $this->setParameter('name', $value);
+    }
+
+    /**
+     * Get the transaction type.
+     *
+     * @return string|null
+     */
+    public function getTrtype()
+    {
+        return $this->getParameter('trtype');
+    }
+
+    /**
+     * Set the transaction type.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setTrtype($value)
+    {
+        return $this->setParameter('trtype', $value);
+    }
+
+    /**
+     * Get the RRN (Retrieval Reference Number).
+     *
+     * @return string|null The RRN
+     */
+    public function getRRN()
+    {
+        return $this->getParameter('rrn');
+    }
+
+    /**
+     * Set the RRN (Retrieval Reference Number).
+     *
+     * @param string $value The RRN
+     * @return $this
+     */
+    public function setRRN($value)
+    {
+        return $this->setParameter('rrn', $value);
+    }
+
+    /**
+     * Get the internal reference number.
+     *
+     * @return string|null The internal reference number
+     */
+    public function getIntRef()
+    {
+        return $this->getParameter('intRef');
+    }
+
+    /**
+     * Set the internal reference number.
+     *
+     * @param string $value The internal reference number
+     * @return $this
+     */
+    public function setIntRef($value)
+    {
+        return $this->setParameter('intRef', $value);
+    }
+
+    /**
+     * Get the transaction description.
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->getParameter('description');
+    }
+
+    /**
+     * Set the transaction description.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setDescription($value)
+    {
+        return $this->setParameter('description', $value);
     }
 }

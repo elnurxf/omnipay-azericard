@@ -75,10 +75,11 @@ class AuthorizeRequest extends AbstractRequest
         $data['P_SIGN'] = $this->sign([
             $amount,
             $data['CURRENCY'],
-            $order,
-            $data['DESC'],
             $data['TERMINAL'],
             $data['TRTYPE'],
+            $data['TIMESTAMP'],
+            $data['NONCE'],
+            $data['MERCH_URL'],
         ]);
 
         return $data;
@@ -121,87 +122,4 @@ class AuthorizeRequest extends AbstractRequest
         return $this->response = new AuthorizeResponse($this, $data);
     }
 
-    /**
-     * Get additional getter/setter methods for authorization-specific fields
-     */
-
-    public function getMerchName()
-    {
-        return $this->getParameter('merchName');
-    }
-
-    public function setMerchName($value)
-    {
-        return $this->setParameter('merchName', $value);
-    }
-
-    public function getMerchUrl()
-    {
-        return $this->getParameter('merchUrl');
-    }
-
-    public function setMerchUrl($value)
-    {
-        return $this->setParameter('merchUrl', $value);
-    }
-
-    public function getEmail()
-    {
-        return $this->getParameter('email');
-    }
-
-    public function setEmail($value)
-    {
-        return $this->setParameter('email', $value);
-    }
-
-    public function getCountry()
-    {
-        return $this->getParameter('country');
-    }
-
-    public function setCountry($value)
-    {
-        return $this->setParameter('country', $value);
-    }
-
-    public function getMerchGmt()
-    {
-        return $this->getParameter('merchGmt');
-    }
-
-    public function setMerchGmt($value)
-    {
-        return $this->setParameter('merchGmt', $value);
-    }
-
-    public function getLang()
-    {
-        return $this->getParameter('lang');
-    }
-
-    public function setLang($value)
-    {
-        return $this->setParameter('lang', $value);
-    }
-
-    public function getCustomerName()
-    {
-        return $this->getParameter('name');
-    }
-
-    public function setCustomerName($value)
-    {
-        return $this->setParameter('name', $value);
-    }
-
-    public function getTrtype()
-    {
-        return $this->getParameter('trtype');
-    }
-
-    public function setTrtype($value)
-    {
-        return $this->setParameter('trtype', $value);
-    }
 }
