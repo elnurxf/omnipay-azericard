@@ -1,7 +1,16 @@
 {
     "name": "elnurxf/omnipay-azericard",
-    "description": "AzeriCard gateway for Omnipay",
+    "description": "AzeriCard e-commerce gateway for Omnipay payment processing library",
+    "keywords": ["omnipay", "azericard", "payment", "gateway", "azerbaijan"],
+    "homepage": "https://github.com/elnurxf/omnipay-azericard",
+    "license": "MIT",
     "type": "library",
+    "authors": [
+        {
+            "name": "Elnur Akhundov",
+            "email": "elnurxf@gmail.com"
+        }
+    ],
     "require": {
         "php": ">=7.4",
         "omnipay/common": "^3.0"
@@ -10,12 +19,5 @@
         "psr-4": {
             "Omnipay\\AzeriCard\\": "src/"
         }
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Elnur Akhundov",
-            "email": "elnurxf@gmail.com"
-        }
-    ]
+    }
 }
