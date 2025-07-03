@@ -17,72 +17,67 @@ class AuthorizeRequest extends AbstractRequest
         $this->validate('amount', 'terminalId');
         $this->validateAuthorizationSpecificFields();
 
-        $timestamp = $this->getTimestamp() ?: $this->generateTimestamp();
-        $nonce     = $this->getNonce() ?: $this->generateNonce();
-        $amount    = $this->formatAmount($this->getAmount());
-        $order     = $this->getOrder() ?: $this->getTransactionId();
+        $timestamp   = $this->getTimestamp() ?: $this->generateTimestamp();
+        $nonce       = $this->getNonce() ?: $this->generateNonce();
+        $amount      = $this->formatAmount($this->getAmount());
+        $order       = $this->getOrder() ?: $this->getTransactionId();
+        $currency    = $this->getCurrency() ?: Constants::CURRENCY_AZN;
+        $description = $this->getDescription() ?: 'Authorization';
+        $terminal    = $this->getTerminalId();
 
         $data = [
-            'AMOUNT'        => $amount,
-            'CURRENCY'      => $this->getCurrency() ?: Constants::CURRENCY_AZN,
-            'ORDER'         => $order,
-            'DESC'          => $this->getDescription() ?: 'Authorization',
-            'TERMINAL'      => $this->getTerminalId(),
-            'TRTYPE'        => Constants::TRTYPE_PRE_AUTH,
-            'TIMESTAMP'     => $timestamp,
-            'NONCE'         => $nonce,
-            'MAC_KEY_INDEX' => 0,
+            Constants::FIELD_AMOUNT        => $amount,
+            Constants::FIELD_CURRENCY      => $currency,
+            Constants::FIELD_ORDER         => $order,
+            Constants::FIELD_DESC          => $description,
+            Constants::FIELD_TERMINAL      => $terminal,
+            Constants::FIELD_TRTYPE        => Constants::TRTYPE_PRE_AUTH,
+            Constants::FIELD_TIMESTAMP     => $timestamp,
+            Constants::FIELD_NONCE         => $nonce,
+            Constants::FIELD_MAC_KEY_INDEX => 0,
         ];
 
         // Add optional fields if provided
-        if ($this->getReturnUrl()) {
-            $data['BACKREF'] = $this->getReturnUrl();
-        }
+        $this->addOptionalFields($data);
 
-        if ($this->getMerchName()) {
-            $data['MERCH_NAME'] = $this->getMerchName();
-        }
-
-        if ($this->getMerchUrl()) {
-            $data['MERCH_URL'] = $this->getMerchUrl();
-        }
-
-        if ($this->getEmail()) {
-            $data['EMAIL'] = $this->getEmail();
-        }
-
-        if ($this->getCountry()) {
-            $data['COUNTRY'] = $this->getCountry();
-        }
-
-        if ($this->getMerchGmt()) {
-            $data['MERCH_GMT'] = $this->getMerchGmt();
-        }
-
-        if ($this->getLang()) {
-            $data['LANG'] = $this->getLang();
-        }
-
-        if ($this->getCustomerName()) {
-            $data['NAME'] = $this->getCustomerName();
-        }
-
-        if ($this->getMInfo()) {
-            $data['M_INFO'] = $this->getMInfo();
-        }
-
-        // Generate signature with core fields
-        $data['P_SIGN'] = $this->sign([
+        // Generate signature - order is critical for AzeriCard
+        $data[Constants::FIELD_P_SIGN] = $this->sign([
             $amount,
-            $data['CURRENCY'],
-            $data['TERMINAL'],
-            $data['TRTYPE'],
-            $data['TIMESTAMP'],
-            $data['NONCE'],
-            $data['MERCH_URL'],
+            $currency,
+            $terminal,
+            Constants::TRTYPE_PRE_AUTH,
+            $timestamp,
+            $nonce,
         ]);
 
         return $data;
+    }
+
+    /**
+     * Add optional fields to the data array.
+     *
+     * @param array &$data The data array to modify
+     * @return void
+     */
+    protected function addOptionalFields(array &$data)
+    {
+        $optionalFields = [
+            'BACKREF'    => $this->getReturnUrl(),
+            'MERCH_NAME' => $this->getMerchName(),
+            'MERCH_URL'  => $this->getMerchUrl(),
+            'EMAIL'      => $this->getEmail(),
+            'COUNTRY'    => $this->getCountry(),
+            'MERCH_GMT'  => $this->getMerchGmt(),
+            'LANG'       => $this->getLang(),
+            'NAME'       => $this->getCustomerName(),
+            'M_INFO'     => $this->getMInfo(),
+        ];
+
+        foreach ($optionalFields as $key => $value) {
+            if ($value !== null) {
+                $data[$key] = $value;
+            }
+        }
     }
 
     /**
@@ -106,7 +101,7 @@ class AuthorizeRequest extends AbstractRequest
 
         // Validate currency format
         $currency = $this->getCurrency();
-        if ($currency && strlen($currency) !== 3) {
+        if ($currency && strlen($currency) !== Constants::MAX_LENGTH_CURRENCY) {
             throw new \InvalidArgumentException('Currency must be exactly 3 characters');
         }
     }
@@ -121,5 +116,4 @@ class AuthorizeRequest extends AbstractRequest
     {
         return $this->response = new AuthorizeResponse($this, $data);
     }
-
 }

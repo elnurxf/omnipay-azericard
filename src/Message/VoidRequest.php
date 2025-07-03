@@ -21,7 +21,7 @@ class VoidRequest extends AbstractRequest
         $nonce     = $this->generateNonce();
 
         $data = [
-            'ORDER'         => $this->getTransactionId(),
+            'ORDER'         => $this->getOrder(),
             'RRN'           => $this->getRRN(),
             'INT_REF'       => $this->getIntRef(),
             'TERMINAL'      => $this->getTerminalId(),

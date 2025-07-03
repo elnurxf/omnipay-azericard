@@ -35,7 +35,7 @@ class RefundResponse extends AbstractResponse
         return $this->data['RRN'] ?? null;
     }
 
-    public function getTransactionId()
+    public function getOrder()
     {
         return $this->data['ORDER'] ?? null;
     }

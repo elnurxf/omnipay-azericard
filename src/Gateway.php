@@ -5,9 +5,11 @@ namespace Omnipay\AzeriCard;
 use Omnipay\AzeriCard\Message\AuthorizeRequest;
 use Omnipay\AzeriCard\Message\CompletePurchaseRequest;
 use Omnipay\AzeriCard\Message\CompleteSaleRequest;
+use Omnipay\AzeriCard\Message\CreateCardRequest;
 use Omnipay\AzeriCard\Message\PurchaseRequest;
 use Omnipay\AzeriCard\Message\RefundRequest;
 use Omnipay\AzeriCard\Message\StatusRequest;
+use Omnipay\AzeriCard\Message\TokenPaymentRequest;
 use Omnipay\AzeriCard\Message\VoidRequest;
 use Omnipay\Common\AbstractGateway;
 
@@ -36,6 +38,69 @@ class Gateway extends AbstractGateway
             'publicKeyPath'  => '',
             'testMode'       => true,
         ];
+    }
+
+    /**
+     * Get the terminal ID.
+     *
+     * @return string|null The terminal ID
+     */
+    public function getTerminalId()
+    {
+        return $this->getParameter('terminalId');
+    }
+
+    /**
+     * Set the terminal ID.
+     *
+     * @param string $value The terminal ID
+     * @return $this
+     */
+    public function setTerminalId($value)
+    {
+        return $this->setParameter('terminalId', $value);
+    }
+
+    /**
+     * Get the private key file path.
+     *
+     * @return string|null The private key file path
+     */
+    public function getPrivateKeyPath()
+    {
+        return $this->getParameter('privateKeyPath');
+    }
+
+    /**
+     * Set the private key file path.
+     *
+     * @param string $value The private key file path
+     * @return $this
+     */
+    public function setPrivateKeyPath($value)
+    {
+        return $this->setParameter('privateKeyPath', $value);
+    }
+
+    /**
+     * Get the public key file path.
+     *
+     * @return string|null The public key file path
+     */
+    public function getPublicKeyPath()
+    {
+        return $this->getParameter('publicKeyPath');
+    }
+
+    /**
+     * Set the public key file path.
+     *
+     * @param string $value The public key file path
+     * @return $this
+     */
+    public function setPublicKeyPath($value)
+    {
+        return $this->setParameter('publicKeyPath', $value);
     }
 
     /**
@@ -116,36 +181,24 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Set the terminal ID.
+     * Create a card creation request.
      *
-     * @param string $value The terminal ID
-     * @return $this
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
      */
-    public function setTerminalId($value)
+    public function createCard(array $parameters = [])
     {
-        return $this->setParameter('terminalId', $value);
+        return $this->createRequest(CreateCardRequest::class, $parameters);
     }
 
     /**
-     * Set the private key file path.
+     * Create a token payment request.
      *
-     * @param string $value The private key file path
-     * @return $this
+     * @param array $parameters Request parameters
+     * @return \Omnipay\Common\Message\RequestInterface
      */
-    public function setPrivateKeyPath($value)
+    public function tokenPayment(array $parameters = [])
     {
-        return $this->setParameter('privateKeyPath', $value);
+        return $this->createRequest(TokenPaymentRequest::class, $parameters);
     }
-
-    /**
-     * Set the public key file path.
-     *
-     * @param string $value The public key file path
-     * @return $this
-     */
-    public function setPublicKeyPath($value)
-    {
-        return $this->setParameter('publicKeyPath', $value);
-    }
-
 }

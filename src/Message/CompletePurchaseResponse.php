@@ -100,11 +100,11 @@ class CompletePurchaseResponse extends AbstractResponse
     }
 
     /**
-     * Get the order ID.
+     * Get the order.
      *
-     * @return string|null The order ID
+     * @return string|null The order
      */
-    public function getOrderId()
+    public function getOrder()
     {
         return $this->data['ORDER'] ?? null;
     }

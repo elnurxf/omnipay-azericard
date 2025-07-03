@@ -24,7 +24,7 @@ class RefundRequest extends AbstractRequest
         $data = [
             'AMOUNT'        => $amount,
             'CURRENCY'      => $this->getCurrency() ?: Constants::CURRENCY_AZN,
-            'ORDER'         => $this->getTransactionId(),
+            'ORDER'         => $this->getOrder(),
             'RRN'           => $this->getRRN(),
             'INT_REF'       => $this->getIntRef(),
             'TERMINAL'      => $this->getTerminalId(),

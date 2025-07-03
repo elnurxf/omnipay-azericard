@@ -20,7 +20,7 @@ class PurchaseRequest extends AbstractRequest
         $timestamp = $this->getTimestamp() ?: $this->generateTimestamp();
         $nonce     = $this->getNonce() ?: $this->generateNonce();
         $amount    = $this->formatAmount($this->getAmount());
-        $order     = $this->getOrder() ?: $this->getTransactionId();
+        $order     = $this->getOrder();
 
         $data = [
             'AMOUNT'        => $amount,

@@ -2,9 +2,9 @@
 
 namespace Omnipay\AzeriCard\Message;
 
+use Omnipay\AzeriCard\Constants;
 use Omnipay\Common\Message\AbstractRequest as BaseRequest;
 
-// Added field validation methods to the AbstractRequest class.
 abstract class AbstractRequest extends BaseRequest
 {
     /**
@@ -14,8 +14,7 @@ abstract class AbstractRequest extends BaseRequest
      */
     protected function generateTimestamp()
     {
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        return $date->format('YmdHis');
+        return gmdate('YmdHis');
     }
 
     /**
@@ -43,15 +42,13 @@ abstract class AbstractRequest extends BaseRequest
      */
     protected function sign(array $fields)
     {
-        $privateKeyPath = $this->getParameter('privateKeyPath');
+        $privateKeyPath = $this->getPrivateKeyPath();
         $this->validatePrivateKey($privateKeyPath);
 
         $source     = $this->buildSignatureSource($fields);
         $privateKey = $this->loadPrivateKey($privateKeyPath);
 
-        $result = openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256);
-
-        if ($result === false) {
+        if (! openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
             throw new \RuntimeException('Failed to sign data: ' . openssl_error_string());
         }
 
@@ -137,27 +134,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Generate a secure nonce with proper length validation.
-     *
-     * @param int $length The length of the nonce (must be between 8 and 32, and even)
-     * @return string Hexadecimal representation of the generated nonce
-     * @throws \InvalidArgumentException When length is invalid
-     */
-    protected function generateSecureNonce($length = 16)
-    {
-        if ($length < 8 || $length > 32) {
-            throw new \InvalidArgumentException('Nonce length must be between 8 and 32 characters');
-        }
-
-        if ($length % 2 !== 0) {
-            throw new \InvalidArgumentException('Nonce length must be even');
-        }
-
-        return bin2hex(random_bytes($length / 2));
-    }
-
-    /**
-     * Validate field lengths according to AzeriCard specifications.
+     * Validate field lengths according to AzeriCard specifications using constants.
      *
      * @return void
      * @throws \InvalidArgumentException When field length validation fails
@@ -165,23 +142,58 @@ abstract class AbstractRequest extends BaseRequest
     protected function validateFieldLengths()
     {
         $validations = [
-            'amount'      => ['max' => 12, 'name' => 'AMOUNT'],
-            'currency'    => ['max' => 3, 'min' => 3, 'name' => 'CURRENCY'],
-            'order'       => ['max' => 32, 'min' => 6, 'name' => 'ORDER'],
-            'description' => ['max' => 50, 'min' => 1, 'name' => 'DESC'],
-            'merchName'   => ['max' => 50, 'min' => 1, 'name' => 'MERCH_NAME'],
-            'merchUrl'    => ['max' => 250, 'min' => 1, 'name' => 'MERCH_URL'],
-            'email'       => ['max' => 80, 'name' => 'EMAIL'],
-            'trtype'      => ['max' => 1, 'name' => 'TRTYPE'],
-            'country'     => ['max' => 2, 'min' => 2, 'name' => 'COUNTRY'],
-            'merchGmt'    => ['max' => 5, 'min' => 1, 'name' => 'MERCH_GMT'],
-            'returnUrl'   => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
-            'timestamp'   => ['max' => 14, 'min' => 14, 'name' => 'TIMESTAMP'],
-            'nonce'       => ['max' => 64, 'min' => 1, 'name' => 'NONCE'],
-            'lang'        => ['max' => 2, 'min' => 2, 'name' => 'LANG'],
-            'pSign'       => ['max' => 256, 'min' => 1, 'name' => 'P_SIGN'],
-            'name'        => ['max' => 45, 'min' => 2, 'name' => 'NAME'],
-            'mInfo'       => ['max' => 35000, 'name' => 'M_INFO'],
+            'amount'      => [
+                'max'  => Constants::MAX_LENGTH_AMOUNT,
+                'name' => 'AMOUNT',
+            ],
+            'currency'    => [
+                'max'  => Constants::MAX_LENGTH_CURRENCY,
+                'min'  => Constants::MAX_LENGTH_CURRENCY,
+                'name' => 'CURRENCY',
+            ],
+            'order'       => [
+                'max'  => Constants::MAX_LENGTH_ORDER,
+                'min'  => Constants::MIN_LENGTH_ORDER,
+                'name' => 'ORDER',
+            ],
+            'description' => [
+                'max'  => Constants::MAX_LENGTH_DESC,
+                'min'  => 1,
+                'name' => 'DESC',
+            ],
+            'merchName'   => [
+                'max'  => Constants::MAX_LENGTH_MERCH_NAME,
+                'min'  => 1,
+                'name' => 'MERCH_NAME',
+            ],
+            'merchUrl'    => [
+                'max'  => Constants::MAX_LENGTH_MERCH_URL,
+                'min'  => 1,
+                'name' => 'MERCH_URL',
+            ],
+            'email'       => [
+                'max'  => Constants::MAX_LENGTH_EMAIL,
+                'name' => 'EMAIL',
+            ],
+            'country'     => [
+                'max'  => Constants::MAX_LENGTH_COUNTRY,
+                'min'  => Constants::MAX_LENGTH_COUNTRY,
+                'name' => 'COUNTRY',
+            ],
+            'lang'        => [
+                'max'  => Constants::MAX_LENGTH_LANG,
+                'min'  => Constants::MAX_LENGTH_LANG,
+                'name' => 'LANG',
+            ],
+            'name'        => [
+                'max'  => Constants::MAX_LENGTH_NAME,
+                'min'  => Constants::MIN_LENGTH_NAME,
+                'name' => 'NAME',
+            ],
+            'mInfo'       => [
+                'max'  => Constants::MAX_LENGTH_M_INFO,
+                'name' => 'M_INFO',
+            ],
         ];
 
         foreach ($validations as $field => $rules) {
@@ -244,27 +256,6 @@ abstract class AbstractRequest extends BaseRequest
     public function getTerminalId()
     {
         return $this->getParameter('terminalId');
-    }
-
-    /**
-     * Get the merchant information.
-     *
-     * @return string|null The merchant information
-     */
-    public function getMInfo()
-    {
-        return $this->getParameter('mInfo');
-    }
-
-    /**
-     * Set the merchant information.
-     *
-     * @param string $value The merchant information
-     * @return $this
-     */
-    public function setMInfo($value)
-    {
-        return $this->setParameter('mInfo', $value);
     }
 
     /**
@@ -559,5 +550,26 @@ abstract class AbstractRequest extends BaseRequest
     public function setDescription($value)
     {
         return $this->setParameter('description', $value);
+    }
+
+    /**
+     * Get the merchant information.
+     *
+     * @return string|null The merchant information
+     */
+    public function getMInfo()
+    {
+        return $this->getParameter('mInfo');
+    }
+
+    /**
+     * Set the merchant information.
+     *
+     * @param string $value The merchant information
+     * @return $this
+     */
+    public function setMInfo($value)
+    {
+        return $this->setParameter('mInfo', $value);
     }
 }
