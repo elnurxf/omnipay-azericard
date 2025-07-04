@@ -52,7 +52,7 @@ class Gateway extends AbstractGateway
     /**
      * Initiate a 3D-Secure authorize (pre-auth) request.
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function authorize(array $parameters = [])
@@ -61,9 +61,9 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a purchase request.
+     * Initiate a purchase (sale) request.
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function purchase(array $parameters = [])
@@ -74,7 +74,7 @@ class Gateway extends AbstractGateway
     /**
      * Initiate a refund request.
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function refund(array $parameters = [])
@@ -83,9 +83,9 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Complete a purchase request (handle callback).
+     * Complete a purchase request (handle callback from bank).
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function completePurchase(array $parameters = [])
@@ -94,9 +94,9 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Complete a sale request (handle callback).
+     * Complete a sale request (handle callback from bank).
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function completeSale(array $parameters = [])
@@ -105,9 +105,9 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a status check request.
+     * Initiate a transaction status check.
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function status(array $parameters = [])
@@ -116,9 +116,9 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a void request.
+     * Initiate a void (cancel) request.
      *
-     * @param array $parameters Request parameters
+     * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
     public function void(array $parameters = [])
@@ -127,7 +127,7 @@ class Gateway extends AbstractGateway
     }
 
     // -------------------------------------------------------------------------
-    // Setters and getters for gateway-level parameters
+    // Gateway parameter setters/getters (always at bottom for style/clarity)
     // -------------------------------------------------------------------------
 
     /**

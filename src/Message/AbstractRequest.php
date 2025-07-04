@@ -5,212 +5,76 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\Common\Message\AbstractRequest as BaseRequest;
 
 /**
- * Base request class for all AzeriCard Omnipay requests.
- *
- * Handles signature generation, field validation, and common parameter accessors.
+ * Base request for all AzeriCard Omnipay requests.
+ * Handles parameter accessors, signature, and validation.
  */
 abstract class AbstractRequest extends BaseRequest
 {
     /**
-     * Generate a timestamp in the format YmdHis (UTC).
-     *
-     * @return string
-     */
-    protected function generateTimestamp()
-    {
-        return gmdate('YmdHis');
-    }
-
-    /**
-     * Generate a random nonce for cryptographic operations.
-     *
-     * @param int $length The length of the nonce (must be even)
-     * @return string Hexadecimal representation of the generated nonce
-     * @throws \InvalidArgumentException When length is not even
-     */
-    protected function generateNonce($length = 16)
-    {
-        if ($length % 2 !== 0) {
-            throw new \InvalidArgumentException('Nonce length must be even');
-        }
-        return bin2hex(random_bytes($length / 2));
-    }
-
-    /**
-     * Sign the given fields using the private key.
-     *
-     * @param array $fields Array of field values to sign (must be ordered)
-     * @return string Hexadecimal representation of the signature
-     * @throws \InvalidArgumentException When private key validation fails
-     * @throws \RuntimeException When signing fails
-     */
-    protected function sign(array $fields)
-    {
-        $privateKeyPath = $this->getPrivateKeyPath();
-        $this->validatePrivateKey($privateKeyPath);
-
-        $source     = $this->buildSignatureSource($fields);
-        $privateKey = $this->loadPrivateKey($privateKeyPath);
-
-        $result = openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256);
-
-        if ($result === false) {
-            throw new \RuntimeException('Failed to sign data: ' . openssl_error_string());
-        }
-
-        return bin2hex($signature);
-    }
-
-    /**
-     * Validate that the private key file exists and is readable.
-     *
-     * @param string $privateKeyPath Path to the private key file
-     * @return void
-     * @throws \InvalidArgumentException When validation fails
-     */
-    protected function validatePrivateKey($privateKeyPath)
-    {
-        if (empty($privateKeyPath)) {
-            throw new \InvalidArgumentException('Private key path not specified');
-        }
-        if (! file_exists($privateKeyPath)) {
-            throw new \InvalidArgumentException('Private key file not found: ' . $privateKeyPath);
-        }
-        if (! is_readable($privateKeyPath)) {
-            throw new \InvalidArgumentException('Private key file is not readable: ' . $privateKeyPath);
-        }
-    }
-
-    /**
-     * Load the private key content from file.
-     *
-     * @param string $privateKeyPath Path to the private key file
-     * @return string The private key content
-     * @throws \RuntimeException When file reading fails
-     */
-    protected function loadPrivateKey($privateKeyPath)
-    {
-        $privateKey = file_get_contents($privateKeyPath);
-        if ($privateKey === false) {
-            throw new \RuntimeException('Failed to read private key file: ' . $privateKeyPath);
-        }
-        return $privateKey;
-    }
-
-    /**
-     * Build the signature source string from field values.
-     *
-     * @param array $fields Array of field values
-     * @return string The concatenated signature source
-     */
-    protected function buildSignatureSource(array $fields)
-    {
-        $source = '';
-        foreach ($fields as $value) {
-            $source .= strlen($value) . $value;
-        }
-        return $source;
-    }
-
-    /**
-     * Format amount to two decimal places.
-     *
-     * @param mixed $amount The amount to format
-     * @return string Formatted amount with 2 decimal places
-     */
-    protected function formatAmount($amount)
-    {
-        return number_format((float) $amount, 2, '.', '');
-    }
-
-    /**
-     * Validate that ORDER field is numeric.
-     *
-     * @return void
-     * @throws \InvalidArgumentException When ORDER field is not numeric
-     */
-    protected function validateOrderField()
-    {
-        $order = $this->getOrder();
-        if ($order && ! is_numeric($order)) {
-            throw new \InvalidArgumentException('ORDER field must be numeric');
-        }
-    }
-
-    /**
-     * Validate field lengths according to AzeriCard specifications.
-     *
-     * @return void
-     * @throws \InvalidArgumentException When field length validation fails
-     */
-    protected function validateFieldLengths()
-    {
-        $validations = [
-            'amount'      => ['max' => 12, 'name' => 'AMOUNT'],
-            'currency'    => ['max' => 3, 'min' => 3, 'name' => 'CURRENCY'],
-            'order'       => ['max' => 32, 'min' => 6, 'name' => 'ORDER'],
-            'description' => ['max' => 50, 'min' => 1, 'name' => 'DESC'],
-            'merchName'   => ['max' => 50, 'min' => 1, 'name' => 'MERCH_NAME'],
-            'merchUrl'    => ['max' => 250, 'min' => 1, 'name' => 'MERCH_URL'],
-            'email'       => ['max' => 80, 'name' => 'EMAIL'],
-            'trtype'      => ['max' => 1, 'name' => 'TRTYPE'],
-            'country'     => ['max' => 2, 'min' => 2, 'name' => 'COUNTRY'],
-            'merchGmt'    => ['max' => 5, 'min' => 1, 'name' => 'MERCH_GMT'],
-            'returnUrl'   => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
-            'timestamp'   => ['max' => 14, 'min' => 14, 'name' => 'TIMESTAMP'],
-            'nonce'       => ['max' => 64, 'min' => 1, 'name' => 'NONCE'],
-            'lang'        => ['max' => 2, 'min' => 2, 'name' => 'LANG'],
-            'pSign'       => ['max' => 256, 'min' => 1, 'name' => 'P_SIGN'],
-            'name'        => ['max' => 45, 'min' => 2, 'name' => 'NAME'],
-            'mInfo'       => ['max' => 35000, 'name' => 'M_INFO'],
-        ];
-
-        foreach ($validations as $field => $rules) {
-            $value = $this->getParameter($field);
-            if ($value !== null) {
-                $length = strlen($value);
-
-                if (isset($rules['min']) && $length < $rules['min']) {
-                    throw new \InvalidArgumentException(
-                        sprintf('%s must be at least %d characters long', $rules['name'], $rules['min'])
-                    );
-                }
-                if (isset($rules['max']) && $length > $rules['max']) {
-                    throw new \InvalidArgumentException(
-                        sprintf('%s must not exceed %d characters', $rules['name'], $rules['max'])
-                    );
-                }
-            }
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Setters/getters for request-level parameters (bottom for style/clarity)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Get the order/transaction identifier.
+     * Get the terminal ID.
      *
      * @return string|null
      */
-    public function getOrder()
+    public function getTerminalId()
     {
-        return $this->getParameter('order') ?: $this->getTransactionId();
+        return $this->getParameter('terminalId');
     }
 
     /**
-     * Set the order/transaction identifier.
+     * Set the terminal ID.
      *
      * @param string $value
      * @return $this
      */
-    public function setOrder($value)
+    public function setTerminalId($value)
     {
-        return $this->setParameter('order', $value);
+        return $this->setParameter('terminalId', $value);
     }
 
     /**
-     * Get the amount.
+     * Get the private key file path.
+     *
+     * @return string|null
+     */
+    public function getPrivateKeyPath()
+    {
+        return $this->getParameter('privateKeyPath');
+    }
+
+    /**
+     * Set the private key file path.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setPrivateKeyPath($value)
+    {
+        return $this->setParameter('privateKeyPath', $value);
+    }
+
+    /**
+     * Get the public key file path.
+     *
+     * @return string|null
+     */
+    public function getPublicKeyPath()
+    {
+        return $this->getParameter('publicKeyPath');
+    }
+
+    /**
+     * Set the public key file path.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setPublicKeyPath($value)
+    {
+        return $this->setParameter('publicKeyPath', $value);
+    }
+
+    /**
+     * Get the order amount.
      *
      * @return string|null
      */
@@ -220,7 +84,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the amount.
+     * Set the order amount.
      *
      * @param string $value
      * @return $this
@@ -252,66 +116,66 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the transaction description.
+     * Get the transaction type (TRTYPE).
      *
      * @return string|null
      */
-    public function getDescription()
+    public function getTrtype()
     {
-        return $this->getParameter('description');
+        return $this->getParameter('trtype');
     }
 
     /**
-     * Set the transaction description.
+     * Set the transaction type (TRTYPE).
      *
      * @param string $value
      * @return $this
      */
-    public function setDescription($value)
+    public function setTrtype($value)
     {
-        return $this->setParameter('description', $value);
+        return $this->setParameter('trtype', $value);
     }
 
     /**
-     * Get the return/callback URL.
+     * Get the transaction timestamp (YYYYMMDDHHMMSS, UTC).
      *
      * @return string|null
      */
-    public function getReturnUrl()
+    public function getTimestamp()
     {
-        return $this->getParameter('returnUrl');
+        return $this->getParameter('timestamp');
     }
 
     /**
-     * Set the return/callback URL.
+     * Set the transaction timestamp.
      *
      * @param string $value
      * @return $this
      */
-    public function setReturnUrl($value)
+    public function setTimestamp($value)
     {
-        return $this->setParameter('returnUrl', $value);
+        return $this->setParameter('timestamp', $value);
     }
 
     /**
-     * Get the merchant name.
+     * Get the merchant nonce.
      *
      * @return string|null
      */
-    public function getMerchName()
+    public function getNonce()
     {
-        return $this->getParameter('merchName');
+        return $this->getParameter('nonce');
     }
 
     /**
-     * Set the merchant name.
+     * Set the merchant nonce.
      *
      * @param string $value
      * @return $this
      */
-    public function setMerchName($value)
+    public function setNonce($value)
     {
-        return $this->setParameter('merchName', $value);
+        return $this->setParameter('nonce', $value);
     }
 
     /**
@@ -335,129 +199,146 @@ abstract class AbstractRequest extends BaseRequest
         return $this->setParameter('merchUrl', $value);
     }
 
+    // --- Validation & helpers ---
+
     /**
-     * Get the merchant email address.
+     * Format amount to two decimal places.
      *
-     * @return string|null
+     * @param mixed $amount
+     * @return string
      */
-    public function getEmail()
+    protected function formatAmount($amount)
     {
-        return $this->getParameter('email');
+        return number_format((float) $amount, 2, '.', '');
     }
 
     /**
-     * Set the merchant email address.
+     * Generate a timestamp in the format YmdHis (UTC).
      *
-     * @param string $value
-     * @return $this
+     * @return string
      */
-    public function setEmail($value)
+    protected function generateTimestamp()
     {
-        return $this->setParameter('email', $value);
+        return gmdate('YmdHis');
     }
 
     /**
-     * Get the country code.
+     * Generate a random nonce for cryptographic operations.
      *
-     * @return string|null
+     * @param int $length
+     * @return string
+     * @throws \InvalidArgumentException
      */
-    public function getCountry()
+    protected function generateNonce($length = 16)
     {
-        return $this->getParameter('country');
+        if ($length % 2 !== 0) {
+            throw new \InvalidArgumentException('Nonce length must be even');
+        }
+        return bin2hex(random_bytes($length / 2));
     }
 
     /**
-     * Set the country code.
+     * Validate presence of all required fields for requests.
+     * Throws \InvalidArgumentException on first missing.
      *
-     * @param string $value
-     * @return $this
+     * @param array $fields
      */
-    public function setCountry($value)
+    protected function validateRequiredFields(array $fields)
     {
-        return $this->setParameter('country', $value);
+        foreach ($fields as $field) {
+            $value = $this->{'get' . ucfirst($field)}();
+            if ($value === null || $value === '') {
+                throw new \InvalidArgumentException("{$field} parameter is required");
+            }
+        }
     }
 
     /**
-     * Get the merchant GMT offset.
+     * Sign the given fields using the private key.
      *
-     * @return string|null
+     * @param array $fields Field values in correct order
+     * @return string
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function getMerchGmt()
+    protected function sign(array $fields)
     {
-        return $this->getParameter('merchGmt');
+        $privateKeyPath = $this->getPrivateKeyPath();
+        $this->validatePrivateKey($privateKeyPath);
+
+        $source     = $this->buildSignatureSource($fields);
+        $privateKey = $this->loadPrivateKey($privateKeyPath);
+
+        $result = openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+        if ($result === false) {
+            throw new \RuntimeException('Failed to sign data: ' . openssl_error_string());
+        }
+
+        return bin2hex($signature);
     }
 
     /**
-     * Set the merchant GMT offset.
+     * Build the signature source string from field values.
      *
-     * @param string $value
-     * @return $this
+     * @param array $fields
+     * @return string
      */
-    public function setMerchGmt($value)
+    protected function buildSignatureSource(array $fields)
     {
-        return $this->setParameter('merchGmt', $value);
+        $source = '';
+        foreach ($fields as $value) {
+            $source .= strlen($value) . $value;
+        }
+        return $source;
     }
 
     /**
-     * Get the language code.
+     * Validate that the private key file exists and is readable.
      *
-     * @return string|null
+     * @param string $privateKeyPath
+     * @return void
+     * @throws \InvalidArgumentException
      */
-    public function getLang()
+    protected function validatePrivateKey($privateKeyPath)
     {
-        return $this->getParameter('lang');
+        if (empty($privateKeyPath)) {
+            throw new \InvalidArgumentException('Private key path not specified');
+        }
+        if (! file_exists($privateKeyPath)) {
+            throw new \InvalidArgumentException('Private key file not found: ' . $privateKeyPath);
+        }
+        if (! is_readable($privateKeyPath)) {
+            throw new \InvalidArgumentException('Private key file is not readable: ' . $privateKeyPath);
+        }
     }
 
     /**
-     * Set the language code.
+     * Load the private key content from file.
      *
-     * @param string $value
-     * @return $this
+     * @param string $privateKeyPath
+     * @return string
+     * @throws \RuntimeException
      */
-    public function setLang($value)
+    protected function loadPrivateKey($privateKeyPath)
     {
-        return $this->setParameter('lang', $value);
+        $privateKey = file_get_contents($privateKeyPath);
+        if ($privateKey === false) {
+            throw new \RuntimeException('Failed to read private key file: ' . $privateKeyPath);
+        }
+        return $privateKey;
     }
 
     /**
-     * Get the customer's full name.
+     * Get the correct AzeriCard endpoint URL based on test mode.
      *
-     * @return string|null
+     * @return string
      */
-    public function getCustomerName()
+    public function getEndpoint()
     {
-        return $this->getParameter('name');
+        return $this->getTestMode()
+        ? \Omnipay\AzeriCard\Constants::TEST_ENDPOINT
+        : \Omnipay\AzeriCard\Constants::PRODUCTION_ENDPOINT;
     }
 
-    /**
-     * Set the customer's full name.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setCustomerName($value)
-    {
-        return $this->setParameter('name', $value);
-    }
-
-    /**
-     * Get the additional info (M_INFO) parameter.
-     *
-     * @return string|null
-     */
-    public function getMInfo()
-    {
-        return $this->getParameter('mInfo');
-    }
-
-    /**
-     * Set the additional info (M_INFO) parameter.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setMInfo($value)
-    {
-        return $this->setParameter('mInfo', $value);
-    }
 }
