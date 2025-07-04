@@ -2,15 +2,19 @@
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\AzeriCard\Constants;
 use Omnipay\Common\Message\AbstractRequest as BaseRequest;
 
+/**
+ * Base request class for all AzeriCard Omnipay requests.
+ *
+ * Handles signature generation, field validation, and common parameter accessors.
+ */
 abstract class AbstractRequest extends BaseRequest
 {
     /**
-     * Generate a timestamp in the format YmdHis.
+     * Generate a timestamp in the format YmdHis (UTC).
      *
-     * @return string The generated timestamp in GMT (UTC) time
+     * @return string
      */
     protected function generateTimestamp()
     {
@@ -35,7 +39,7 @@ abstract class AbstractRequest extends BaseRequest
     /**
      * Sign the given fields using the private key.
      *
-     * @param array $fields Array of field values to sign
+     * @param array $fields Array of field values to sign (must be ordered)
      * @return string Hexadecimal representation of the signature
      * @throws \InvalidArgumentException When private key validation fails
      * @throws \RuntimeException When signing fails
@@ -48,7 +52,9 @@ abstract class AbstractRequest extends BaseRequest
         $source     = $this->buildSignatureSource($fields);
         $privateKey = $this->loadPrivateKey($privateKeyPath);
 
-        if (! openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256)) {
+        $result = openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+        if ($result === false) {
             throw new \RuntimeException('Failed to sign data: ' . openssl_error_string());
         }
 
@@ -67,11 +73,9 @@ abstract class AbstractRequest extends BaseRequest
         if (empty($privateKeyPath)) {
             throw new \InvalidArgumentException('Private key path not specified');
         }
-
         if (! file_exists($privateKeyPath)) {
             throw new \InvalidArgumentException('Private key file not found: ' . $privateKeyPath);
         }
-
         if (! is_readable($privateKeyPath)) {
             throw new \InvalidArgumentException('Private key file is not readable: ' . $privateKeyPath);
         }
@@ -103,7 +107,7 @@ abstract class AbstractRequest extends BaseRequest
     {
         $source = '';
         foreach ($fields as $value) {
-            $source .= strlen((string) $value) . $value;
+            $source .= strlen($value) . $value;
         }
         return $source;
     }
@@ -120,7 +124,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Validate that ORDER field is numeric and meets requirements.
+     * Validate that ORDER field is numeric.
      *
      * @return void
      * @throws \InvalidArgumentException When ORDER field is not numeric
@@ -134,7 +138,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Validate field lengths according to AzeriCard specifications using constants.
+     * Validate field lengths according to AzeriCard specifications.
      *
      * @return void
      * @throws \InvalidArgumentException When field length validation fails
@@ -142,58 +146,23 @@ abstract class AbstractRequest extends BaseRequest
     protected function validateFieldLengths()
     {
         $validations = [
-            'amount'      => [
-                'max'  => Constants::MAX_LENGTH_AMOUNT,
-                'name' => 'AMOUNT',
-            ],
-            'currency'    => [
-                'max'  => Constants::MAX_LENGTH_CURRENCY,
-                'min'  => Constants::MAX_LENGTH_CURRENCY,
-                'name' => 'CURRENCY',
-            ],
-            'order'       => [
-                'max'  => Constants::MAX_LENGTH_ORDER,
-                'min'  => Constants::MIN_LENGTH_ORDER,
-                'name' => 'ORDER',
-            ],
-            'description' => [
-                'max'  => Constants::MAX_LENGTH_DESC,
-                'min'  => 1,
-                'name' => 'DESC',
-            ],
-            'merchName'   => [
-                'max'  => Constants::MAX_LENGTH_MERCH_NAME,
-                'min'  => 1,
-                'name' => 'MERCH_NAME',
-            ],
-            'merchUrl'    => [
-                'max'  => Constants::MAX_LENGTH_MERCH_URL,
-                'min'  => 1,
-                'name' => 'MERCH_URL',
-            ],
-            'email'       => [
-                'max'  => Constants::MAX_LENGTH_EMAIL,
-                'name' => 'EMAIL',
-            ],
-            'country'     => [
-                'max'  => Constants::MAX_LENGTH_COUNTRY,
-                'min'  => Constants::MAX_LENGTH_COUNTRY,
-                'name' => 'COUNTRY',
-            ],
-            'lang'        => [
-                'max'  => Constants::MAX_LENGTH_LANG,
-                'min'  => Constants::MAX_LENGTH_LANG,
-                'name' => 'LANG',
-            ],
-            'name'        => [
-                'max'  => Constants::MAX_LENGTH_NAME,
-                'min'  => Constants::MIN_LENGTH_NAME,
-                'name' => 'NAME',
-            ],
-            'mInfo'       => [
-                'max'  => Constants::MAX_LENGTH_M_INFO,
-                'name' => 'M_INFO',
-            ],
+            'amount'      => ['max' => 12, 'name' => 'AMOUNT'],
+            'currency'    => ['max' => 3, 'min' => 3, 'name' => 'CURRENCY'],
+            'order'       => ['max' => 32, 'min' => 6, 'name' => 'ORDER'],
+            'description' => ['max' => 50, 'min' => 1, 'name' => 'DESC'],
+            'merchName'   => ['max' => 50, 'min' => 1, 'name' => 'MERCH_NAME'],
+            'merchUrl'    => ['max' => 250, 'min' => 1, 'name' => 'MERCH_URL'],
+            'email'       => ['max' => 80, 'name' => 'EMAIL'],
+            'trtype'      => ['max' => 1, 'name' => 'TRTYPE'],
+            'country'     => ['max' => 2, 'min' => 2, 'name' => 'COUNTRY'],
+            'merchGmt'    => ['max' => 5, 'min' => 1, 'name' => 'MERCH_GMT'],
+            'returnUrl'   => ['max' => 250, 'min' => 1, 'name' => 'BACKREF'],
+            'timestamp'   => ['max' => 14, 'min' => 14, 'name' => 'TIMESTAMP'],
+            'nonce'       => ['max' => 64, 'min' => 1, 'name' => 'NONCE'],
+            'lang'        => ['max' => 2, 'min' => 2, 'name' => 'LANG'],
+            'pSign'       => ['max' => 256, 'min' => 1, 'name' => 'P_SIGN'],
+            'name'        => ['max' => 45, 'min' => 2, 'name' => 'NAME'],
+            'mInfo'       => ['max' => 35000, 'name' => 'M_INFO'],
         ];
 
         foreach ($validations as $field => $rules) {
@@ -206,7 +175,6 @@ abstract class AbstractRequest extends BaseRequest
                         sprintf('%s must be at least %d characters long', $rules['name'], $rules['min'])
                     );
                 }
-
                 if (isset($rules['max']) && $length > $rules['max']) {
                     throw new \InvalidArgumentException(
                         sprintf('%s must not exceed %d characters', $rules['name'], $rules['max'])
@@ -216,52 +184,14 @@ abstract class AbstractRequest extends BaseRequest
         }
     }
 
-    /**
-     * Get the API endpoint URL based on test mode.
-     *
-     * @return string The endpoint URL
-     */
-    public function getEndpoint()
-    {
-        return $this->getTestMode()
-        ? 'https://testmpi.3dsecure.az/cgi-bin/cgi_link'
-        : 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
-    }
-
-    /**
-     * Get the private key file path.
-     *
-     * @return string|null The private key file path
-     */
-    public function getPrivateKeyPath()
-    {
-        return $this->getParameter('privateKeyPath');
-    }
-
-    /**
-     * Get the public key file path.
-     *
-     * @return string|null The public key file path
-     */
-    public function getPublicKeyPath()
-    {
-        return $this->getParameter('publicKeyPath');
-    }
-
-    /**
-     * Get the terminal ID.
-     *
-     * @return string|null The terminal ID
-     */
-    public function getTerminalId()
-    {
-        return $this->getParameter('terminalId');
-    }
+    // -------------------------------------------------------------------------
+    // Setters/getters for request-level parameters (bottom for style/clarity)
+    // -------------------------------------------------------------------------
 
     /**
      * Get the order/transaction identifier.
      *
-     * @return string|null The order identifier
+     * @return string|null
      */
     public function getOrder()
     {
@@ -269,9 +199,9 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the order identifier.
+     * Set the order/transaction identifier.
      *
-     * @param string $value The order identifier
+     * @param string $value
      * @return $this
      */
     public function setOrder($value)
@@ -280,45 +210,87 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the timestamp.
+     * Get the amount.
      *
-     * @return string|null The timestamp
+     * @return string|null
      */
-    public function getTimestamp()
+    public function getAmount()
     {
-        return $this->getParameter('timestamp');
+        return $this->getParameter('amount');
     }
 
     /**
-     * Set the timestamp.
+     * Set the amount.
      *
-     * @param string $value The timestamp
+     * @param string $value
      * @return $this
      */
-    public function setTimestamp($value)
+    public function setAmount($value)
     {
-        return $this->setParameter('timestamp', $value);
+        return $this->setParameter('amount', $value);
     }
 
     /**
-     * Get the nonce.
+     * Get the currency code.
      *
-     * @return string|null The nonce
+     * @return string|null
      */
-    public function getNonce()
+    public function getCurrency()
     {
-        return $this->getParameter('nonce');
+        return $this->getParameter('currency');
     }
 
     /**
-     * Set the nonce.
+     * Set the currency code.
      *
-     * @param string $value The nonce
+     * @param string $value
      * @return $this
      */
-    public function setNonce($value)
+    public function setCurrency($value)
     {
-        return $this->setParameter('nonce', $value);
+        return $this->setParameter('currency', $value);
+    }
+
+    /**
+     * Get the transaction description.
+     *
+     * @return string|null
+     */
+    public function getDescription()
+    {
+        return $this->getParameter('description');
+    }
+
+    /**
+     * Set the transaction description.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setDescription($value)
+    {
+        return $this->setParameter('description', $value);
+    }
+
+    /**
+     * Get the return/callback URL.
+     *
+     * @return string|null
+     */
+    public function getReturnUrl()
+    {
+        return $this->getParameter('returnUrl');
+    }
+
+    /**
+     * Set the return/callback URL.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setReturnUrl($value)
+    {
+        return $this->setParameter('returnUrl', $value);
     }
 
     /**
@@ -469,93 +441,9 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the transaction type.
+     * Get the additional info (M_INFO) parameter.
      *
      * @return string|null
-     */
-    public function getTrtype()
-    {
-        return $this->getParameter('trtype');
-    }
-
-    /**
-     * Set the transaction type.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setTrtype($value)
-    {
-        return $this->setParameter('trtype', $value);
-    }
-
-    /**
-     * Get the RRN (Retrieval Reference Number).
-     *
-     * @return string|null The RRN
-     */
-    public function getRRN()
-    {
-        return $this->getParameter('rrn');
-    }
-
-    /**
-     * Set the RRN (Retrieval Reference Number).
-     *
-     * @param string $value The RRN
-     * @return $this
-     */
-    public function setRRN($value)
-    {
-        return $this->setParameter('rrn', $value);
-    }
-
-    /**
-     * Get the internal reference number.
-     *
-     * @return string|null The internal reference number
-     */
-    public function getIntRef()
-    {
-        return $this->getParameter('intRef');
-    }
-
-    /**
-     * Set the internal reference number.
-     *
-     * @param string $value The internal reference number
-     * @return $this
-     */
-    public function setIntRef($value)
-    {
-        return $this->setParameter('intRef', $value);
-    }
-
-    /**
-     * Get the transaction description.
-     *
-     * @return string|null
-     */
-    public function getDescription()
-    {
-        return $this->getParameter('description');
-    }
-
-    /**
-     * Set the transaction description.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setDescription($value)
-    {
-        return $this->setParameter('description', $value);
-    }
-
-    /**
-     * Get the merchant information.
-     *
-     * @return string|null The merchant information
      */
     public function getMInfo()
     {
@@ -563,9 +451,9 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the merchant information.
+     * Set the additional info (M_INFO) parameter.
      *
-     * @param string $value The merchant information
+     * @param string $value
      * @return $this
      */
     public function setMInfo($value)

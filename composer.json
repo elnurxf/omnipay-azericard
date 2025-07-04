@@ -12,11 +12,7 @@
         }
     ],
     "require": {
-        "php": ">=7.4",
         "omnipay/common": "^3.0",
-        "symfony/http-client": "^7.3",
-        "php-http/httplug": "^2.4",
-        "nyholm/psr7": "^1.8",
         "php-http/guzzle7-adapter": "^1.1"
     },
     "autoload": {

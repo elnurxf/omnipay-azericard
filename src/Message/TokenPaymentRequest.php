@@ -13,7 +13,7 @@ class TokenPaymentRequest extends AbstractRequest
         $data = [
             'AMOUNT'    => $amount,
             'CURRENCY'  => 'AZN',
-            'ORDER'     => $this->getOrder(),
+            'ORDER'     => $this->getTransactionId(),
             'TOKEN'     => $this->getParameter('token'),
             'TERMINAL'  => $this->getParameter('terminalId'),
             'TRTYPE'    => '1',

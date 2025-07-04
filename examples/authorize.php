@@ -20,7 +20,7 @@ try {
     $authResponse = $gateway->authorize([
         'amount'      => '50.00',
         'currency'    => 'AZN',
-        'order'       => '12345',
+        'order'       => '123456',
         'merchUrl'    => 'https://yoursite.com/auth-callback',
         'description' => 'Authorization for Order #12345',
         'email'       => 'customer@example.com',
@@ -28,8 +28,10 @@ try {
     ])->send();
 
     if ($authResponse->isRedirect()) {
-        echo "Redirecting to AzeriCard for authorization...\n";
-        echo "Redirect URL: " . $authResponse->getRedirectUrl() . "\n";
+        $authResponse->redirect();
+
+        //echo "Redirecting to AzeriCard for authorization...\n";
+        //echo "Redirect URL: " . $authResponse->getRedirectUrl() . "\n";
         // In real application: $authResponse->redirect();
     } else {
         echo "Authorization Error: " . $authResponse->getMessage() . "\n";

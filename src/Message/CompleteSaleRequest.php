@@ -24,7 +24,7 @@ class CompleteSaleRequest extends AbstractRequest
         $data = [
             'AMOUNT'        => $amount,
             'CURRENCY'      => Constants::CURRENCY_AZN,
-            'ORDER'         => $this->getOrder(),
+            'ORDER'         => $this->getTransactionId(),
             'RRN'           => $this->getRRN(),
             'INT_REF'       => $this->getIntRef(),
             'TERMINAL'      => $this->getTerminalId(),
@@ -75,4 +75,45 @@ class CompleteSaleRequest extends AbstractRequest
         }
     }
 
+    /**
+     * Get the RRN (Retrieval Reference Number).
+     *
+     * @return string|null The RRN
+     */
+    public function getRRN()
+    {
+        return $this->getParameter('rrn');
+    }
+
+    /**
+     * Set the RRN (Retrieval Reference Number).
+     *
+     * @param string $value The RRN
+     * @return $this
+     */
+    public function setRRN($value)
+    {
+        return $this->setParameter('rrn', $value);
+    }
+
+    /**
+     * Get the internal reference number.
+     *
+     * @return string|null The internal reference number
+     */
+    public function getIntRef()
+    {
+        return $this->getParameter('intRef');
+    }
+
+    /**
+     * Set the internal reference number.
+     *
+     * @param string $value The internal reference number
+     * @return $this
+     */
+    public function setIntRef($value)
+    {
+        return $this->setParameter('intRef', $value);
+    }
 }

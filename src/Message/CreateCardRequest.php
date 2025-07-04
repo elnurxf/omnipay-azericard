@@ -10,7 +10,7 @@ class CreateCardRequest extends AbstractRequest
         $nonce     = $this->generateNonce();
 
         $data = [
-            'ORDER'        => $this->getOrder(),
+            'ORDER'        => $this->getTransactionId(),
             'TERMINAL'     => $this->getParameter('terminalId'),
             'TRTYPE'       => '1',
             'TOKEN_ACTION' => 'REGISTER',

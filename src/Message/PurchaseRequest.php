@@ -20,7 +20,7 @@ class PurchaseRequest extends AbstractRequest
         $timestamp = $this->getTimestamp() ?: $this->generateTimestamp();
         $nonce     = $this->getNonce() ?: $this->generateNonce();
         $amount    = $this->formatAmount($this->getAmount());
-        $order     = $this->getOrder();
+        $order     = $this->getOrder() ?: $this->getTransactionId();
 
         $data = [
             'AMOUNT'        => $amount,
@@ -129,4 +129,13 @@ class PurchaseRequest extends AbstractRequest
         return $this->response = new PurchaseResponse($this, $data);
     }
 
+    public function getCustomerName()
+    {
+        return $this->getParameter('name');
+    }
+
+    public function setCustomerName($value)
+    {
+        return $this->setParameter('name', $value);
+    }
 }
