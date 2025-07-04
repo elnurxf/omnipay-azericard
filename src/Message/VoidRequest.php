@@ -5,7 +5,7 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\AzeriCard\Constants;
 
 /**
- * AzeriCard void (cancel) request.
+ * AzeriCard void (offline reversal) request (TRTYPE=24).
  */
 class VoidRequest extends AbstractRequest
 {
@@ -13,7 +13,6 @@ class VoidRequest extends AbstractRequest
      * Get the void request data.
      *
      * @return array
-     * @throws \InvalidArgumentException
      */
     public function getData()
     {

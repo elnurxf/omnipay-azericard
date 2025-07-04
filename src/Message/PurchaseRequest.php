@@ -5,12 +5,12 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\AzeriCard\Constants;
 
 /**
- * AzeriCard 3D-Secure purchase (sale) request.
+ * AzeriCard direct purchase request (TRTYPE=0).
  */
 class PurchaseRequest extends AbstractRequest
 {
     /**
-     * Get the purchase (sale) request data.
+     * Get the purchase request data.
      *
      * @return array
      * @throws \InvalidArgumentException

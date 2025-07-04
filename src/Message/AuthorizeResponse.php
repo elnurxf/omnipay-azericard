@@ -5,23 +5,15 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;
 
+/**
+ * AzeriCard authorize response handler.
+ */
 class AuthorizeResponse extends AbstractResponse implements RedirectResponseInterface
 {
     /**
-     * Check if the request was successful.
-     * For authorization requests, we need to redirect to the gateway.
+     * Is a redirect required?
      *
-     * @return bool Always false for redirect responses
-     */
-    public function isSuccessful()
-    {
-        return false;
-    }
-
-    /**
-     * Check if this is a redirect response.
-     *
-     * @return bool Always true for authorization requests
+     * @return bool
      */
     public function isRedirect()
     {
@@ -29,9 +21,9 @@ class AuthorizeResponse extends AbstractResponse implements RedirectResponseInte
     }
 
     /**
-     * Get the redirect URL.
+     * Get the redirect URL for the customer.
      *
-     * @return string The gateway URL
+     * @return string|null
      */
     public function getRedirectUrl()
     {
@@ -39,9 +31,9 @@ class AuthorizeResponse extends AbstractResponse implements RedirectResponseInte
     }
 
     /**
-     * Get the redirect method (POST for form submission).
+     * Get the redirect method (POST).
      *
-     * @return string Always 'POST'
+     * @return string
      */
     public function getRedirectMethod()
     {
@@ -49,9 +41,9 @@ class AuthorizeResponse extends AbstractResponse implements RedirectResponseInte
     }
 
     /**
-     * Get the redirect data (form fields).
+     * Get redirect data (fields to post).
      *
-     * @return array The form data to submit
+     * @return array
      */
     public function getRedirectData()
     {
@@ -59,22 +51,22 @@ class AuthorizeResponse extends AbstractResponse implements RedirectResponseInte
     }
 
     /**
-     * Get the transaction reference.
+     * There is no "success" at this stage.
      *
-     * @return string|null The transaction reference
+     * @return bool
      */
-    public function getTransactionReference()
+    public function isSuccessful()
     {
-        return $this->data['ORDER'] ?? null;
+        return false;
     }
 
     /**
-     * Get a message describing the response.
+     * Error message (not applicable here).
      *
-     * @return string The response message
+     * @return string|null
      */
     public function getMessage()
     {
-        return 'Redirecting to AzeriCard gateway for authorization';
+        return null;
     }
 }

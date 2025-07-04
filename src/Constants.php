@@ -3,54 +3,48 @@
 namespace Omnipay\AzeriCard;
 
 /**
- * Defines constants used throughout the AzeriCard Omnipay integration.
+ * Constants for AzeriCard integration.
  */
 final class Constants
 {
-    /**
-     * Azerbaijani Manat currency code.
-     */
-    public const CURRENCY_AZN = '944';
+                                              // --- Transaction Types (TRTYPE) ---
+    public const TRTYPE_PRE_AUTH      = '1';  // 3D Secure Pre-Authorization (auth)
+    public const TRTYPE_SALE          = '0';  // Purchase/Sale
+    public const TRTYPE_COMPLETE_AUTH = '21'; // Completion of pre-auth
+    public const TRTYPE_REFUND        = '22'; // Refund / Reversal
+    public const TRTYPE_VOID          = '24'; // Offline reversal / Void
+    public const TRTYPE_STATUS        = '90'; // Status inquiry
 
-    /**
-     * Transaction type for pre-authorization (block funds, not captured).
-     */
-    public const TRTYPE_PRE_AUTH = '1';
+    // --- Endpoints ---
+    public const TEST_ENDPOINT = 'https://testmpi.3dsecure.az/cgi-bin/cgi_link';
+    public const PROD_ENDPOINT = 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
 
-    /**
-     * Transaction type for sale/purchase (authorize + capture).
-     */
-    public const TRTYPE_SALE = '0';
+                                       // --- Default Currency ---
+    public const CURRENCY_AZN = '944'; // ISO numeric code for Azerbaijani Manat
 
-    /**
-     * Transaction type for refund.
-     */
-    public const TRTYPE_REFUND = '24';
+    // --- Field Lengths ---
+    public const ORDER_MIN_LENGTH    = 6;
+    public const ORDER_MAX_LENGTH    = 32;
+    public const MERCH_NAME_MAX      = 50;
+    public const MERCH_URL_MAX       = 250;
+    public const DESC_MAX            = 50;
+    public const EMAIL_MAX           = 80;
+    public const COUNTRY_CODE_LENGTH = 2;
+    public const TIMESTAMP_LENGTH    = 14;
+    public const NONCE_MIN_LENGTH    = 8;
+    public const NONCE_MAX_LENGTH    = 32;
+    public const LANG_LENGTH         = 2;
+    public const P_SIGN_MAX          = 256;
+    public const NAME_MAX            = 45;
+    public const M_INFO_MAX          = 35000;
 
-    /**
-     * Transaction type for reversal (void/cancel).
-     */
-    public const TRTYPE_VOID = '22';
-
-    /**
-     * Transaction type for status inquiry.
-     */
-    public const TRTYPE_STATUS = '31';
-
-    /**
-     * Default MAC key index (typically 0 unless bank assigns otherwise).
-     */
+    // --- MAC Key Index ---
     public const MAC_KEY_INDEX = 0;
 
     /**
-     * Test endpoint URL.
+     * This class should not be instantiated.
      */
-    public const TEST_ENDPOINT = 'https://testmpi.3dsecure.az/cgi-bin/cgi_link';
-
-    /**
-     * Production endpoint URL.
-     */
-    public const PRODUCTION_ENDPOINT = 'https://mpi.3dsecure.az/cgi-bin/cgi_link';
-
-    // Add other constants as required by your integration.
+    private function __construct()
+    {
+    }
 }

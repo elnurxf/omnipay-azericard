@@ -2,16 +2,30 @@
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\Common\Message\AbstractRequest as BaseRequest;
+use Omnipay\AzeriCard\Constants;
+use Omnipay\Common\Message\AbstractRequest as OmnipayAbstractRequest;
 
 /**
- * Base request for all AzeriCard Omnipay requests.
- * Handles parameter accessors, signature, and validation.
+ * Base abstract request for AzeriCard Omnipay integration.
  */
-abstract class AbstractRequest extends BaseRequest
+abstract class AbstractRequest extends OmnipayAbstractRequest
 {
     /**
-     * Get the terminal ID.
+     * Get the AzeriCard gateway endpoint based on test mode.
+     *
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->getTestMode()
+        ? Constants::TEST_ENDPOINT
+        : Constants::PROD_ENDPOINT;
+    }
+
+    // ---- Required parameter accessors ----
+
+    /**
+     * Get Terminal ID.
      *
      * @return string|null
      */
@@ -21,7 +35,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the terminal ID.
+     * Set Terminal ID.
      *
      * @param string $value
      * @return $this
@@ -32,7 +46,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the private key file path.
+     * Get private key file path.
      *
      * @return string|null
      */
@@ -42,7 +56,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the private key file path.
+     * Set private key file path.
      *
      * @param string $value
      * @return $this
@@ -53,7 +67,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the public key file path.
+     * Get public key file path.
      *
      * @return string|null
      */
@@ -63,7 +77,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the public key file path.
+     * Set public key file path.
      *
      * @param string $value
      * @return $this
@@ -74,70 +88,240 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the order amount.
+     * Get merchant URL.
      *
      * @return string|null
      */
-    public function getAmount()
+    public function getMerchUrl()
     {
-        return $this->getParameter('amount');
+        return $this->getParameter('merchUrl');
     }
 
     /**
-     * Set the order amount.
+     * Set merchant URL.
      *
      * @param string $value
      * @return $this
      */
-    public function setAmount($value)
+    public function setMerchUrl($value)
     {
-        return $this->setParameter('amount', $value);
+        return $this->setParameter('merchUrl', $value);
     }
 
+    // ---- Optional documented parameter accessors ----
+
     /**
-     * Get the currency code.
+     * Get order identifier.
      *
      * @return string|null
      */
-    public function getCurrency()
+    public function getOrder()
     {
-        return $this->getParameter('currency');
+        return $this->getParameter('order');
     }
 
     /**
-     * Set the currency code.
+     * Set order identifier.
      *
      * @param string $value
      * @return $this
      */
-    public function setCurrency($value)
+    public function setOrder($value)
     {
-        return $this->setParameter('currency', $value);
+        return $this->setParameter('order', $value);
     }
 
     /**
-     * Get the transaction type (TRTYPE).
+     * Get description.
      *
      * @return string|null
      */
-    public function getTrtype()
+    public function getDescription()
     {
-        return $this->getParameter('trtype');
+        return $this->getParameter('description');
     }
 
     /**
-     * Set the transaction type (TRTYPE).
+     * Set description.
      *
      * @param string $value
      * @return $this
      */
-    public function setTrtype($value)
+    public function setDescription($value)
     {
-        return $this->setParameter('trtype', $value);
+        return $this->setParameter('description', $value);
     }
 
     /**
-     * Get the transaction timestamp (YYYYMMDDHHMMSS, UTC).
+     * Get email.
+     *
+     * @return string|null
+     */
+    public function getEmail()
+    {
+        return $this->getParameter('email');
+    }
+
+    /**
+     * Set email.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setEmail($value)
+    {
+        return $this->setParameter('email', $value);
+    }
+
+    /**
+     * Get customer name.
+     *
+     * @return string|null
+     */
+    public function getCustomerName()
+    {
+        return $this->getParameter('name');
+    }
+
+    /**
+     * Set customer name.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setCustomerName($value)
+    {
+        return $this->setParameter('name', $value);
+    }
+
+    /**
+     * Get merchant name.
+     *
+     * @return string|null
+     */
+    public function getMerchName()
+    {
+        return $this->getParameter('merchName');
+    }
+
+    /**
+     * Set merchant name.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMerchName($value)
+    {
+        return $this->setParameter('merchName', $value);
+    }
+
+    /**
+     * Get country code.
+     *
+     * @return string|null
+     */
+    public function getCountry()
+    {
+        return $this->getParameter('country');
+    }
+
+    /**
+     * Set country code.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setCountry($value)
+    {
+        return $this->setParameter('country', $value);
+    }
+
+    /**
+     * Get merchant GMT.
+     *
+     * @return string|null
+     */
+    public function getMerchGmt()
+    {
+        return $this->getParameter('merchGmt');
+    }
+
+    /**
+     * Set merchant GMT.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMerchGmt($value)
+    {
+        return $this->setParameter('merchGmt', $value);
+    }
+
+    /**
+     * Get language.
+     *
+     * @return string|null
+     */
+    public function getLang()
+    {
+        return $this->getParameter('lang');
+    }
+
+    /**
+     * Set language.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setLang($value)
+    {
+        return $this->setParameter('lang', $value);
+    }
+
+    /**
+     * Get merchant info (M_INFO).
+     *
+     * @return string|null
+     */
+    public function getMInfo()
+    {
+        return $this->getParameter('mInfo');
+    }
+
+    /**
+     * Set merchant info (M_INFO).
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setMInfo($value)
+    {
+        return $this->setParameter('mInfo', $value);
+    }
+
+    /**
+     * Get return/callback URL (BACKREF).
+     *
+     * @return string|null
+     */
+    public function getReturnUrl()
+    {
+        return $this->getParameter('returnUrl');
+    }
+
+    /**
+     * Set return/callback URL (BACKREF).
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setReturnUrl($value)
+    {
+        return $this->setParameter('returnUrl', $value);
+    }
+
+    /**
+     * Get timestamp.
      *
      * @return string|null
      */
@@ -147,7 +331,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the transaction timestamp.
+     * Set timestamp.
      *
      * @param string $value
      * @return $this
@@ -158,7 +342,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the merchant nonce.
+     * Get nonce.
      *
      * @return string|null
      */
@@ -168,7 +352,7 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Set the merchant nonce.
+     * Set nonce.
      *
      * @param string $value
      * @return $this
@@ -179,57 +363,31 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Get the merchant URL.
-     *
-     * @return string|null
-     */
-    public function getMerchUrl()
-    {
-        return $this->getParameter('merchUrl');
-    }
-
-    /**
-     * Set the merchant URL.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setMerchUrl($value)
-    {
-        return $this->setParameter('merchUrl', $value);
-    }
-
-    // --- Validation & helpers ---
-
-    /**
-     * Format amount to two decimal places.
+     * Format amount to two decimal places, string.
      *
      * @param mixed $amount
      * @return string
      */
-    protected function formatAmount($amount)
+    protected function formatAmount($amount): string
     {
         return number_format((float) $amount, 2, '.', '');
     }
 
     /**
-     * Generate a timestamp in the format YmdHis (UTC).
-     *
+     * Generate timestamp in 'YmdHis' (UTC).
      * @return string
      */
-    protected function generateTimestamp()
+    protected function generateTimestamp(): string
     {
         return gmdate('YmdHis');
     }
 
     /**
-     * Generate a random nonce for cryptographic operations.
-     *
+     * Generate a random hexadecimal nonce.
      * @param int $length
      * @return string
-     * @throws \InvalidArgumentException
      */
-    protected function generateNonce($length = 16)
+    protected function generateNonce($length = 16): string
     {
         if ($length % 2 !== 0) {
             throw new \InvalidArgumentException('Nonce length must be even');
@@ -238,30 +396,34 @@ abstract class AbstractRequest extends BaseRequest
     }
 
     /**
-     * Validate presence of all required fields for requests.
-     * Throws \InvalidArgumentException on first missing.
+     * Validate that required fields are set and non-empty.
      *
      * @param array $fields
+     * @return void
+     * @throws \InvalidArgumentException
      */
     protected function validateRequiredFields(array $fields)
     {
         foreach ($fields as $field) {
-            $value = $this->{'get' . ucfirst($field)}();
+            $getter = 'get' . ucfirst($field);
+            $value  = method_exists($this, $getter)
+            ? $this->{$getter}()
+            : $this->getParameter($field);
             if ($value === null || $value === '') {
-                throw new \InvalidArgumentException("{$field} parameter is required");
+                throw new \InvalidArgumentException("The {$field} parameter is required");
             }
         }
     }
 
     /**
-     * Sign the given fields using the private key.
+     * Build P_SIGN signature according to AzeriCard protocol.
+     * Pass fields in the exact order and value (use '-' for missing).
      *
-     * @param array $fields Field values in correct order
+     * @param array $fields Field values in order
      * @return string
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws \InvalidArgumentException|\RuntimeException
      */
-    protected function sign(array $fields)
+    protected function sign(array $fields): string
     {
         $privateKeyPath = $this->getPrivateKeyPath();
         $this->validatePrivateKey($privateKeyPath);
@@ -270,25 +432,26 @@ abstract class AbstractRequest extends BaseRequest
         $privateKey = $this->loadPrivateKey($privateKeyPath);
 
         $result = openssl_sign($source, $signature, $privateKey, OPENSSL_ALGO_SHA256);
-
         if ($result === false) {
             throw new \RuntimeException('Failed to sign data: ' . openssl_error_string());
         }
-
         return bin2hex($signature);
     }
 
     /**
-     * Build the signature source string from field values.
-     *
+     * Build signature source string: len+value (or just '-' for missing), no length for '-'.
      * @param array $fields
      * @return string
      */
-    protected function buildSignatureSource(array $fields)
+    protected function buildSignatureSource(array $fields): string
     {
         $source = '';
         foreach ($fields as $value) {
-            $source .= strlen($value) . $value;
+            if ($value === null || $value === '') {
+                $source .= '-';
+            } else {
+                $source .= strlen((string) $value) . $value;
+            }
         }
         return $source;
     }
@@ -320,7 +483,7 @@ abstract class AbstractRequest extends BaseRequest
      * @return string
      * @throws \RuntimeException
      */
-    protected function loadPrivateKey($privateKeyPath)
+    protected function loadPrivateKey($privateKeyPath): string
     {
         $privateKey = file_get_contents($privateKeyPath);
         if ($privateKey === false) {
@@ -328,17 +491,4 @@ abstract class AbstractRequest extends BaseRequest
         }
         return $privateKey;
     }
-
-    /**
-     * Get the correct AzeriCard endpoint URL based on test mode.
-     *
-     * @return string
-     */
-    public function getEndpoint()
-    {
-        return $this->getTestMode()
-        ? \Omnipay\AzeriCard\Constants::TEST_ENDPOINT
-        : \Omnipay\AzeriCard\Constants::PRODUCTION_ENDPOINT;
-    }
-
 }

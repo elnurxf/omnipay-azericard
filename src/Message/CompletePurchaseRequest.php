@@ -3,17 +3,20 @@
 namespace Omnipay\AzeriCard\Message;
 
 /**
- * Handle AzeriCard callback for purchase.
+ * AzeriCard completion request (callback after customer returns from bank).
  */
 class CompletePurchaseRequest extends AbstractRequest
 {
     /**
-     * Get data sent from AzeriCard in callback.
+     * Get the completion request data (callback from gateway).
      *
      * @return array
      */
     public function getData()
     {
+        // In a real-world scenario, you might want to validate the
+        // incoming POST data, verify P_SIGN, etc.
+        // For Omnipay, just return $_POST (or whatever data Omnipay provides).
         return $this->httpRequest->request->all();
     }
 

@@ -17,7 +17,6 @@ class AuthorizeRequest extends AbstractRequest
      */
     public function getData()
     {
-        // Validate required fields
         $this->validateRequiredFields([
             'amount',
             'terminalId',
@@ -34,7 +33,48 @@ class AuthorizeRequest extends AbstractRequest
             'MERCH_URL' => $this->getMerchUrl(),
         ];
 
-        // Build signature directly from $data, in the required field order
+        // Optional/documented fields
+        if ($this->getOrder()) {
+            $data['ORDER'] = $this->getOrder();
+        }
+
+        if ($this->getDescription()) {
+            $data['DESC'] = $this->getDescription();
+        }
+
+        if ($this->getEmail()) {
+            $data['EMAIL'] = $this->getEmail();
+        }
+
+        if ($this->getCustomerName()) {
+            $data['NAME'] = $this->getCustomerName();
+        }
+
+        if ($this->getMerchName()) {
+            $data['MERCH_NAME'] = $this->getMerchName();
+        }
+
+        if ($this->getCountry()) {
+            $data['COUNTRY'] = $this->getCountry();
+        }
+
+        if ($this->getMerchGmt()) {
+            $data['MERCH_GMT'] = $this->getMerchGmt();
+        }
+
+        if ($this->getLang()) {
+            $data['LANG'] = $this->getLang();
+        }
+
+        if ($this->getMInfo()) {
+            $data['M_INFO'] = $this->getMInfo();
+        }
+
+        if ($this->getReturnUrl()) {
+            $data['BACKREF'] = $this->getReturnUrl();
+        }
+
+        // Signature
         $data['P_SIGN'] = $this->sign([
             $data['AMOUNT'],
             $data['CURRENCY'],

@@ -4,7 +4,6 @@ namespace Omnipay\AzeriCard;
 
 use Omnipay\AzeriCard\Message\AuthorizeRequest;
 use Omnipay\AzeriCard\Message\CompletePurchaseRequest;
-use Omnipay\AzeriCard\Message\CompleteSaleRequest;
 use Omnipay\AzeriCard\Message\PurchaseRequest;
 use Omnipay\AzeriCard\Message\RefundRequest;
 use Omnipay\AzeriCard\Message\StatusRequest;
@@ -14,32 +13,26 @@ use Omnipay\Common\AbstractGateway;
 /**
  * AzeriCard Gateway for Omnipay.
  *
- * @method \Omnipay\AzeriCard\Message\AuthorizeRequest authorize(array $options = [])
- * @method \Omnipay\AzeriCard\Message\PurchaseRequest purchase(array $options = [])
- * @method \Omnipay\AzeriCard\Message\RefundRequest refund(array $options = [])
- * @method \Omnipay\AzeriCard\Message\CompletePurchaseRequest completePurchase(array $options = [])
- * @method \Omnipay\AzeriCard\Message\CompleteSaleRequest completeSale(array $options = [])
- * @method \Omnipay\AzeriCard\Message\StatusRequest status(array $options = [])
- * @method \Omnipay\AzeriCard\Message\VoidRequest void(array $options = [])
+ * Provides methods for all supported transaction types.
  */
 class Gateway extends AbstractGateway
 {
     /**
-     * Get the gateway display name.
+     * Gateway display name.
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'AzeriCard';
     }
 
     /**
-     * Get the default parameters for this gateway.
+     * Default gateway parameters.
      *
      * @return array
      */
-    public function getDefaultParameters()
+    public function getDefaultParameters(): array
     {
         return [
             'terminalId'     => '',
@@ -50,7 +43,70 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a 3D-Secure authorize (pre-auth) request.
+     * Get terminal ID.
+     *
+     * @return string|null
+     */
+    public function getTerminalId(): ?string
+    {
+        return $this->getParameter('terminalId');
+    }
+
+    /**
+     * Set terminal ID.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setTerminalId(string $value): self
+    {
+        return $this->setParameter('terminalId', $value);
+    }
+
+    /**
+     * Get private key file path.
+     *
+     * @return string|null
+     */
+    public function getPrivateKeyPath(): ?string
+    {
+        return $this->getParameter('privateKeyPath');
+    }
+
+    /**
+     * Set private key file path.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setPrivateKeyPath(string $value): self
+    {
+        return $this->setParameter('privateKeyPath', $value);
+    }
+
+    /**
+     * Get public key file path.
+     *
+     * @return string|null
+     */
+    public function getPublicKeyPath(): ?string
+    {
+        return $this->getParameter('publicKeyPath');
+    }
+
+    /**
+     * Set public key file path.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setPublicKeyPath(string $value): self
+    {
+        return $this->setParameter('publicKeyPath', $value);
+    }
+
+    /**
+     * Start a 3D Secure pre-authorization (TRTYPE=1).
      *
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
@@ -61,7 +117,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a purchase (sale) request.
+     * Start a direct purchase (TRTYPE=0).
      *
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
@@ -72,18 +128,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Initiate a refund request.
-     *
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\RequestInterface
-     */
-    public function refund(array $parameters = [])
-    {
-        return $this->createRequest(RefundRequest::class, $parameters);
-    }
-
-    /**
-     * Complete a purchase request (handle callback from bank).
+     * Handle gateway callback (usually POST from AzeriCard).
      *
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
@@ -94,29 +139,18 @@ class Gateway extends AbstractGateway
     }
 
     /**
-     * Complete a sale request (handle callback from bank).
+     * Refund an authorized transaction (TRTYPE=22).
      *
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
-    public function completeSale(array $parameters = [])
+    public function refund(array $parameters = [])
     {
-        return $this->createRequest(CompleteSaleRequest::class, $parameters);
+        return $this->createRequest(RefundRequest::class, $parameters);
     }
 
     /**
-     * Initiate a transaction status check.
-     *
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\RequestInterface
-     */
-    public function status(array $parameters = [])
-    {
-        return $this->createRequest(StatusRequest::class, $parameters);
-    }
-
-    /**
-     * Initiate a void (cancel) request.
+     * Void (cancel) a transaction (TRTYPE=24).
      *
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
@@ -126,70 +160,14 @@ class Gateway extends AbstractGateway
         return $this->createRequest(VoidRequest::class, $parameters);
     }
 
-    // -------------------------------------------------------------------------
-    // Gateway parameter setters/getters (always at bottom for style/clarity)
-    // -------------------------------------------------------------------------
-
     /**
-     * Get the terminal ID.
+     * Get transaction status (TRTYPE=90).
      *
-     * @return string|null
+     * @param array $parameters
+     * @return \Omnipay\Common\Message\RequestInterface
      */
-    public function getTerminalId()
+    public function status(array $parameters = [])
     {
-        return $this->getParameter('terminalId');
-    }
-
-    /**
-     * Set the terminal ID.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setTerminalId($value)
-    {
-        return $this->setParameter('terminalId', $value);
-    }
-
-    /**
-     * Get the private key file path.
-     *
-     * @return string|null
-     */
-    public function getPrivateKeyPath()
-    {
-        return $this->getParameter('privateKeyPath');
-    }
-
-    /**
-     * Set the private key file path.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setPrivateKeyPath($value)
-    {
-        return $this->setParameter('privateKeyPath', $value);
-    }
-
-    /**
-     * Get the public key file path.
-     *
-     * @return string|null
-     */
-    public function getPublicKeyPath()
-    {
-        return $this->getParameter('publicKeyPath');
-    }
-
-    /**
-     * Set the public key file path.
-     *
-     * @param string $value
-     * @return $this
-     */
-    public function setPublicKeyPath($value)
-    {
-        return $this->setParameter('publicKeyPath', $value);
+        return $this->createRequest(StatusRequest::class, $parameters);
     }
 }

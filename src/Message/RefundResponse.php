@@ -2,41 +2,53 @@
 
 namespace Omnipay\AzeriCard\Message;
 
-use Omnipay\AzeriCard\Constants;
 use Omnipay\Common\Message\AbstractResponse;
+use Omnipay\Common\Message\RedirectResponseInterface;
 
-class RefundResponse extends AbstractResponse
+/**
+ * AzeriCard refund response handler.
+ */
+class RefundResponse extends AbstractResponse implements RedirectResponseInterface
 {
+    /**
+     * Is a redirect required?
+     *
+     * @return bool
+     */
+    public function isRedirect()
+    {
+        // Usually not a redirect, unless you want to show a form for confirmation
+        return false;
+    }
+
+    /**
+     * Get the redirect URL (not used).
+     *
+     * @return string|null
+     */
+    public function getRedirectUrl()
+    {
+        return null;
+    }
+
+    /**
+     * Is the refund successful?
+     *
+     * @return bool
+     */
     public function isSuccessful()
     {
-        return isset($this->data['ACTION']) && $this->data['ACTION'] === Constants::ACTION_SUCCESS;
+        // AzeriCard returns ACTION=0 for success
+        return (isset($this->data['ACTION']) && (string) $this->data['ACTION'] === '0');
     }
 
-    public function getTransactionReference()
-    {
-        return $this->data['INT_REF'] ?? null;
-    }
-
+    /**
+     * Get the response message.
+     *
+     * @return string|null
+     */
     public function getMessage()
     {
-        if (! $this->isSuccessful()) {
-            return $this->data['DESC'] ?? 'Refund failed';
-        }
-        return $this->data['DESC'] ?? 'Refund successful';
-    }
-
-    public function getCode()
-    {
-        return $this->data['ACTION'] ?? null;
-    }
-
-    public function getRRN()
-    {
-        return $this->data['RRN'] ?? null;
-    }
-
-    public function getTransactionId()
-    {
-        return $this->data['ORDER'] ?? null;
+        return $this->data['DESC'] ?? null;
     }
 }

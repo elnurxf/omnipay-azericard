@@ -5,7 +5,7 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\AzeriCard\Constants;
 
 /**
- * AzeriCard transaction status check request.
+ * AzeriCard status inquiry request (TRTYPE=90).
  */
 class StatusRequest extends AbstractRequest
 {
@@ -13,19 +13,17 @@ class StatusRequest extends AbstractRequest
      * Get the status request data.
      *
      * @return array
-     * @throws \InvalidArgumentException
      */
     public function getData()
     {
         $this->validateRequiredFields([
-            'amount',
             'terminalId',
+            'order',
             'merchUrl',
         ]);
 
         $data = [
-            'AMOUNT'    => $this->formatAmount($this->getAmount()),
-            'CURRENCY'  => $this->getCurrency() ?: Constants::CURRENCY_AZN,
+            'ORDER'     => $this->getOrder(),
             'TERMINAL'  => $this->getTerminalId(),
             'TRTYPE'    => Constants::TRTYPE_STATUS,
             'TIMESTAMP' => $this->getTimestamp() ?: $this->generateTimestamp(),
@@ -34,8 +32,7 @@ class StatusRequest extends AbstractRequest
         ];
 
         $data['P_SIGN'] = $this->sign([
-            $data['AMOUNT'],
-            $data['CURRENCY'],
+            $data['ORDER'],
             $data['TERMINAL'],
             $data['TRTYPE'],
             $data['TIMESTAMP'],

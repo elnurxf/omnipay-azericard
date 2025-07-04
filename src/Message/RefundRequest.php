@@ -5,7 +5,7 @@ namespace Omnipay\AzeriCard\Message;
 use Omnipay\AzeriCard\Constants;
 
 /**
- * AzeriCard refund request.
+ * AzeriCard refund (reversal) request (TRTYPE=22).
  */
 class RefundRequest extends AbstractRequest
 {
@@ -13,7 +13,6 @@ class RefundRequest extends AbstractRequest
      * Get the refund request data.
      *
      * @return array
-     * @throws \InvalidArgumentException
      */
     public function getData()
     {
