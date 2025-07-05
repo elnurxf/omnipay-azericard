@@ -11,7 +11,7 @@ use Omnipay\AzeriCard\Message\Responses\PurchaseResponse;
 class PurchaseRequest extends AbstractRequest
 {
     /**
-     * Get the purchase request data.
+     * Get the authorization request data.
      *
      * @return array
      * @throws \InvalidArgumentException
@@ -34,6 +34,48 @@ class PurchaseRequest extends AbstractRequest
             'MERCH_URL' => $this->getMerchUrl(),
         ];
 
+        // Optional/documented fields
+        if ($this->getOrder()) {
+            $data['ORDER'] = $this->getOrder();
+        }
+
+        if ($this->getDescription()) {
+            $data['DESC'] = $this->getDescription();
+        }
+
+        if ($this->getEmail()) {
+            $data['EMAIL'] = $this->getEmail();
+        }
+
+        if ($this->getCustomerName()) {
+            $data['NAME'] = $this->getCustomerName();
+        }
+
+        if ($this->getMerchName()) {
+            $data['MERCH_NAME'] = $this->getMerchName();
+        }
+
+        if ($this->getCountry()) {
+            $data['COUNTRY'] = $this->getCountry();
+        }
+
+        if ($this->getMerchGmt()) {
+            $data['MERCH_GMT'] = $this->getMerchGmt();
+        }
+
+        if ($this->getLang()) {
+            $data['LANG'] = $this->getLang();
+        }
+
+        if ($this->getMInfo()) {
+            $data['M_INFO'] = $this->getMInfo();
+        }
+
+        if ($this->getReturnUrl()) {
+            $data['BACKREF'] = $this->getReturnUrl();
+        }
+
+        // Signature
         $data['P_SIGN'] = $this->sign([
             $data['AMOUNT'],
             $data['CURRENCY'],
