@@ -1,14 +1,14 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Responses;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;
 
 /**
- * AzeriCard authorize response handler.
+ * AzeriCard purchase response handler.
  */
-class AuthorizeResponse extends AbstractResponse implements RedirectResponseInterface
+class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
 {
     /**
      * Is a redirect required?

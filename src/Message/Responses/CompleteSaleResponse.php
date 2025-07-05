@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Responses;
 
 use Omnipay\Common\Message\AbstractResponse;
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Requests;
 
 use Omnipay\AzeriCard\Constants;
+use Omnipay\AzeriCard\Message\Responses\RefundResponse;
 
 /**
  * AzeriCard refund (reversal) request (TRTYPE=22).

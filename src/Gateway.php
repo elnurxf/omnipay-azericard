@@ -2,12 +2,12 @@
 
 namespace Omnipay\AzeriCard;
 
-use Omnipay\AzeriCard\Message\AuthorizeRequest;
-use Omnipay\AzeriCard\Message\CompletePurchaseRequest;
-use Omnipay\AzeriCard\Message\PurchaseRequest;
-use Omnipay\AzeriCard\Message\RefundRequest;
-use Omnipay\AzeriCard\Message\StatusRequest;
-use Omnipay\AzeriCard\Message\VoidRequest;
+use Omnipay\AzeriCard\Message\Requests\AuthorizeRequest;
+use Omnipay\AzeriCard\Message\Requests\CompletePurchaseRequest;
+use Omnipay\AzeriCard\Message\Requests\PurchaseRequest;
+use Omnipay\AzeriCard\Message\Requests\RefundRequest;
+use Omnipay\AzeriCard\Message\Requests\StatusRequest;
+use Omnipay\AzeriCard\Message\Requests\VoidRequest;
 use Omnipay\Common\AbstractGateway;
 
 /**

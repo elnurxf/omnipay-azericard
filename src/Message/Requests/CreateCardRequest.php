@@ -1,6 +1,8 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Requests;
+
+use Omnipay\AzeriCard\Message\Responses\PurchaseResponse;
 
 class CreateCardRequest extends AbstractRequest
 {

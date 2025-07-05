@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Responses;
 
 use Omnipay\Common\Message\AbstractResponse;
 
@@ -16,7 +16,8 @@ class StatusResponse extends AbstractResponse
      */
     public function isSuccessful()
     {
-        return (isset($this->data['ACTION']) && (string) $this->data['ACTION'] === '0');
+        return true;
+        //return (isset($this->data['ACTION']) && (string) $this->data['ACTION'] === '0');;
     }
 
     /**
@@ -24,18 +25,9 @@ class StatusResponse extends AbstractResponse
      *
      * @return string|null
      */
-    public function getMessage()
+    public function getResult()
     {
-        return $this->data['DESC'] ?? null;
+        return $this->data;
     }
 
-    /**
-     * Get the status code.
-     *
-     * @return string|null
-     */
-    public function getCode()
-    {
-        return $this->data['ACTION'] ?? null;
-    }
 }

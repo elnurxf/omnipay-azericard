@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\AzeriCard\Message;
+namespace Omnipay\AzeriCard\Message\Requests;
 
 use Omnipay\AzeriCard\Constants;
 use Omnipay\Common\Message\AbstractRequest as OmnipayAbstractRequest;
