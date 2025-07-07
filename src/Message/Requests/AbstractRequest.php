@@ -153,6 +153,27 @@ abstract class AbstractRequest extends OmnipayAbstractRequest
     }
 
     /**
+     * Get tran_trtype identifier.
+     *
+     * @return string|null
+     */
+    public function getTranTrtype()
+    {
+        return $this->getParameter('tran_trtype');
+    }
+
+    /**
+     * Set tran_trtype identifier.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setTranTrtype($value)
+    {
+        return $this->setParameter('tran_trtype', $value);
+    }
+
+    /**
      * Get order identifier.
      *
      * @return string|null
