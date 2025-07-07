@@ -41,10 +41,4 @@ final class Constants
     // --- MAC Key Index ---
     public const MAC_KEY_INDEX = 0;
 
-    /**
-     * This class should not be instantiated.
-     */
-    private function __construct()
-    {
-    }
 }

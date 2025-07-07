@@ -92,7 +92,7 @@ try {
         'currency'      => 'AZN',
         'transactionId' => 'AUTH12345',
         'rrn'           => '317276406077',
-        'intRef'        => 'ABC123XYZ987',
+        'INT_REF'       => 'ABC123XYZ987',
     ])->send();
 
     if ($captureResponse->isSuccessful()) {
@@ -112,7 +112,7 @@ try {
         'currency'      => 'AZN',
         'transactionId' => '12345',
         'rrn'           => '317276406077',
-        'intRef'        => 'ABC123XYZ987',
+        'INT_REF'       => 'ABC123XYZ987',
     ])->send();
 
     if ($refundResponse->isSuccessful()) {
@@ -130,7 +130,7 @@ try {
     $statusResponse = $gateway->status([
         'transactionId' => '12345',
         'rrn'           => '317276406077',
-        'intRef'        => 'ABC123XYZ987',
+        'INT_REF'       => 'ABC123XYZ987',
     ])->send();
 
     if ($statusResponse->isSuccessful()) {

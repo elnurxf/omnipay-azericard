@@ -3,17 +3,18 @@
 namespace Omnipay\AzeriCard\Message\Requests;
 
 use Omnipay\AzeriCard\Constants;
-use Omnipay\AzeriCard\Message\Responses\VoidResponse;
+use Omnipay\AzeriCard\Message\Responses\CheckoutResponse;
 
 /**
- * AzeriCard void (offline reversal) request (TRTYPE=24).
+ * AzeriCard 3D-Secure checkout request.
  */
-class VoidRequest extends AbstractRequest
+class CheckoutRequest extends AbstractRequest
 {
     /**
-     * Get the void request data.
+     * Get the checkout request data.
      *
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function getData()
     {
@@ -25,17 +26,18 @@ class VoidRequest extends AbstractRequest
         ]);
 
         $data = [
+            'ORDER'     => $this->getOrder(),
             'AMOUNT'    => $this->formatAmount($this->getAmount()),
             'CURRENCY'  => $this->getCurrency() ?: Constants::CURRENCY_AZN,
-            'ORDER'     => $this->getOrder(),
+            'TERMINAL'  => $this->getTerminalId(),
             'RRN'       => $this->getRRN(),
             'INT_REF'   => $this->getIntRef(),
-            'TERMINAL'  => $this->getTerminalId(),
-            'TRTYPE'    => Constants::TRTYPE_VOID,
+            'TRTYPE'    => Constants::TRTYPE_COMPLETE_AUTH,
             'TIMESTAMP' => $this->getTimestamp() ?: $this->generateTimestamp(),
             'NONCE'     => $this->getNonce() ?: $this->generateNonce(),
         ];
 
+        // Signature
         $data['P_SIGN'] = $this->sign([
             $data['AMOUNT'],
             $data['CURRENCY'],
@@ -53,10 +55,10 @@ class VoidRequest extends AbstractRequest
      * Send the data and create response.
      *
      * @param array $data
-     * @return VoidResponse
+     * @return CheckoutResponse
      */
     public function sendData($data)
     {
-        return $this->response = new VoidResponse($this, $data);
+        return $this->response = new CheckoutResponse($this, $data);
     }
 }

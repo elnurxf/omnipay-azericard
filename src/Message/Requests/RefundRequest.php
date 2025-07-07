@@ -19,18 +19,21 @@ class RefundRequest extends AbstractRequest
     {
         $this->validateRequiredFields([
             'amount',
-            'terminalId',
-            'merchUrl',
+            'order',
+            'rrn',
+            'int_ref',
         ]);
 
         $data = [
             'AMOUNT'    => $this->formatAmount($this->getAmount()),
             'CURRENCY'  => $this->getCurrency() ?: Constants::CURRENCY_AZN,
+            'ORDER'     => $this->getOrder(),
+            'RRN'       => $this->getRRN(),
+            'INT_REF'   => $this->getIntRef(),
             'TERMINAL'  => $this->getTerminalId(),
             'TRTYPE'    => Constants::TRTYPE_REFUND,
             'TIMESTAMP' => $this->getTimestamp() ?: $this->generateTimestamp(),
             'NONCE'     => $this->getNonce() ?: $this->generateNonce(),
-            'MERCH_URL' => $this->getMerchUrl(),
         ];
 
         $data['P_SIGN'] = $this->sign([
@@ -38,9 +41,9 @@ class RefundRequest extends AbstractRequest
             $data['CURRENCY'],
             $data['TERMINAL'],
             $data['TRTYPE'],
-            $data['TIMESTAMP'],
-            $data['NONCE'],
-            $data['MERCH_URL'],
+            $data['ORDER'],
+            $data['RRN'],
+            $data['INT_REF'],
         ]);
 
         return $data;

@@ -116,7 +116,7 @@ $response = $gateway->completeSale([
     'currency'      => 'AZN',
     'transactionId' => 'AUTH12345', // Original authorization transaction ID
     'rrn'           => '317276406077', // RRN from authorization callback
-    'intRef'        => 'ABC123XYZ987', // INT_REF from authorization callback
+    'INT_REF'        => 'ABC123XYZ987', // INT_REF from authorization callback
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -137,7 +137,7 @@ $response = $gateway->refund([
     'currency'      => 'AZN',
     'transactionId' => '12345', // Original transaction ID
     'rrn'           => '317276406077', // RRN from original transaction
-    'intRef'        => 'ABC123XYZ987', // INT_REF from original transaction
+    'INT_REF'        => 'ABC123XYZ987', // INT_REF from original transaction
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -157,7 +157,7 @@ if ($response->isSuccessful()) {
 $response = $gateway->void([
     'transactionId' => 'AUTH12345', // Original authorization transaction ID
     'rrn'           => '317276406077', // RRN from authorization
-    'intRef'        => 'ABC123XYZ987', // INT_REF from authorization
+    'INT_REF'        => 'ABC123XYZ987', // INT_REF from authorization
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -175,7 +175,7 @@ if ($response->isSuccessful()) {
 $response = $gateway->status([
     'transactionId' => '12345',
     'rrn'           => '317276406077',
-    'intRef'        => 'ABC123XYZ987',
+    'INT_REF'        => 'ABC123XYZ987',
 ])->send();
 
 if ($response->isSuccessful()) {
@@ -204,21 +204,21 @@ $authResponse = $gateway->authorize([
 $callbackResponse = $gateway->completePurchase()->send();
 if ($callbackResponse->isSuccessful()) {
     $rrn = $callbackResponse->getRRN();
-    $intRef = $callbackResponse->getTransactionReference();
+    $INT_REF = $callbackResponse->getTransactionReference();
     
     // Step 3a: Capture the full amount
     $captureResponse = $gateway->completeSale([
         'amount' => '100.00',
         'transactionId' => '12345',
         'rrn' => $rrn,
-        'intRef' => $intRef,
+        'INT_REF' => $INT_REF,
     ])->send();
     
     // OR Step 3b: Void the authorization
     $voidResponse = $gateway->void([
         'transactionId' => '12345',
         'rrn' => $rrn,
-        'intRef' => $intRef,
+        'INT_REF' => $INT_REF,
     ])->send();
 }
 ```

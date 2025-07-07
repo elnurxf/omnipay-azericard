@@ -3,7 +3,8 @@
 namespace Omnipay\AzeriCard;
 
 use Omnipay\AzeriCard\Message\Requests\AuthorizeRequest;
-use Omnipay\AzeriCard\Message\Requests\CompletePurchaseRequest;
+use Omnipay\AzeriCard\Message\Requests\CheckoutRequest;
+use Omnipay\AzeriCard\Message\Requests\HandleCallbackRequest;
 use Omnipay\AzeriCard\Message\Requests\PurchaseRequest;
 use Omnipay\AzeriCard\Message\Requests\RefundRequest;
 use Omnipay\AzeriCard\Message\Requests\StatusRequest;
@@ -117,6 +118,17 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     * Complete the payment (TRTYPE=21).
+     *
+     * @param array $parameters
+     * @return \Omnipay\Common\Message\RequestInterface
+     */
+    public function checkout(array $parameters = [])
+    {
+        return $this->createRequest(CheckoutRequest::class, $parameters);
+    }
+
+    /**
      * Start a direct purchase (TRTYPE=0).
      *
      * @param array $parameters
@@ -133,9 +145,9 @@ class Gateway extends AbstractGateway
      * @param array $parameters
      * @return \Omnipay\Common\Message\RequestInterface
      */
-    public function completePurchase(array $parameters = [])
+    public function handleCallback(array $parameters = [])
     {
-        return $this->createRequest(CompletePurchaseRequest::class, $parameters);
+        return $this->createRequest(HandleCallbackRequest::class, $parameters);
     }
 
     /**

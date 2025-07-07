@@ -111,6 +111,48 @@ abstract class AbstractRequest extends OmnipayAbstractRequest
     // ---- Optional documented parameter accessors ----
 
     /**
+     * Get RRN identifier.
+     *
+     * @return string|null
+     */
+    public function getRRN()
+    {
+        return $this->getParameter('rrn');
+    }
+
+    /**
+     * Set RRN identifier.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setRRN($value)
+    {
+        return $this->setParameter('rrn', $value);
+    }
+
+    /**
+     * Get int_ref identifier.
+     *
+     * @return string|null
+     */
+    public function getIntRef()
+    {
+        return $this->getParameter('int_ref');
+    }
+
+    /**
+     * Set int_ref identifier.
+     *
+     * @param string $value
+     * @return $this
+     */
+    public function setIntRef($value)
+    {
+        return $this->setParameter('int_ref', $value);
+    }
+
+    /**
      * Get order identifier.
      *
      * @return string|null
