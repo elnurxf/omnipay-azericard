@@ -48,7 +48,7 @@ class StatusRequest extends AbstractRequest
      * @param array $data
      * @return StatusResponse
      */
-    /*public function sendData($data)
+    public function sendData($data)
     {
         $httpResponse = $this->httpClient->request(
             'POST',
@@ -65,7 +65,7 @@ class StatusRequest extends AbstractRequest
         parse_str($body, $responseData);
 
         return $this->response = new StatusResponse($this, $responseData);
-    }*/
+    }
 
     /**
      * Send the data and create response.
@@ -73,8 +73,8 @@ class StatusRequest extends AbstractRequest
      * @param array $data
      * @return StatusResponse
      */
-    public function sendData($data)
+    /*public function sendData($data)
     {
         return $this->response = new StatusResponse($this, $data);
-    }
+    }*/
 }
